@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataHub - Consultoria em Dados e Analytics</title>
+    <link rel="icon" href="png/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+<base target="_blank">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="#top" class="logo-wrap" aria-label="DataHub logo">
+                <img src="png/datahub-logo.png" alt="DataHub" class="logo-img" onerror="this.style.display='none';" />
+                <span class="logo-text">DataHub</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#cases">Cases</a></li>
+                <li><a href="#segmentos">Segmentos</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="#contato" class="btn-primary">Fale Conosco</a>
+            </div>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content animate">
+                <h1>Do caos ao <span>clarity</span>.<br>Do dado à <span>decisão</span>.</h1>
+                <p>A DataHub transforma a complexidade dos seus dados em vantagem competitiva clara e mensurável. Consultoria especializada em Data Analytics, BI e Governança de Dados.</p>
+                <div class="hero-buttons">
+                    <a href="#contato" class="btn-primary">Iniciar Transformação</a>
+                    <a href="#servicos" class="btn-outline" style="color: white; border-color: white;">Conhecer Soluções</a>
+                </div>
+            </div>
+            <div class="hero-visual animate">
+                <div class="dashboard-preview">
+                    <div class="chart-placeholder video-preview" aria-label="Preview de vídeo de tendência crescente">
+                        <video class="chart-video" id="chartPreviewVideo" muted autoplay loop playsinline preload="metadata" poster="https://via.placeholder.com/480x240?text=Vídeo+preview">
+                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                            Seu navegador não suporta vídeo HTML5.
+                        </video>
+                        <div class="video-overlay">
+                            <div class="video-label">Vídeo de tendência de crescimento</div>
+                            <div class="video-tip">Substitua o src pelo seu vídeo real</div>
+                        </div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <h3>+150%</h3>
+                            <p>Eficiência</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>-40%</h3>
+                            <p>Custos</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>3x</h3>
+                            <p>ROI</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="servicos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Soluções especializadas para sua transformação digital</h2>
+                <p>Oferecemos um portfólio completo de serviços em dados, desde a estratégia até a implementação técnica.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chess-king"></i>
+                    </div>
+                    <h3>Data Strategy</h3>
+                    <p>Definição de roadmap data-driven alinhado aos objetivos estratégicos do negócio. Transforme dados em ativos corporativos valiosos.</p>
+                    <a href="#" class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Business Intelligence</h3>
+                    <p>Dashboards interativos e relatórios automatizados que contam histórias, não apenas números. Visualizações que geram insights acionáveis.</p>
+                    <a href="#" class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Data Governance</h3>
+                    <p>Qualidade, segurança, conformidade LGPD e gestão de metadados. Garanta a confiabilidade e proteção dos seus dados corporativos.</p>
+                    <a href="#" class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Data Engineering</h3>
+                    <p>Arquitetura de dados escalável, pipelines ETL/ELT robustos e data lakes. Infraestrutura técnica para suportar grandes volumes.</p>
+                    <a href="#" class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Advanced Analytics</h3>
+                    <p>Modelos preditivos, machine learning e análise prescritiva. Antecipe tendências e automatize decisões complexas.</p>
+                    <a href="#" class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3>Cloud Data</h3>
+                    <p>Migração para nuvem, modernização de infraestrutura e arquiteturas cloud-native. AWS, Azure e Google Cloud.</p>
+                    <a href="#" class="service-link">Saiba mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h2>50+</h2>
+                    <p>Projetos Entregues</p>
+                </div>
+                <div class="stat-box">
+                    <h2>98%</h2>
+                    <p>Clientes Satisfeitos</p>
+                </div>
+                <div class="stat-box">
+                    <h2>30+</h2>
+                    <p>Especialistas</p>
+                </div>
+                <div class="stat-box">
+                    <h2>5</h2>
+                    <p>Anos de Mercado</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cases Section -->
+    <section class="cases" id="cases">
+        <div class="container">
+            <div class="section-header">
+                <h2>Resultados que geram impacto real</h2>
+                <p>Conheça como ajudamos empresas a transformar dados em resultados concretos.</p>
+            </div>
+            <div class="cases-grid">
+                <div class="case-card">
+                    <div class="case-header">
+                        <h3>Otimização de Supply Chain</h3>
+                        <div class="company">Varejo Nacional</div>
+                    </div>
+                    <div class="case-body">
+                        <div class="case-result">-35% custos</div>
+                        <p>Implementação de modelo preditivo de demanda que reduziu quebras de estoque em 60% e otimizou o capital de giro em R$ 12M.</p>
+                    </div>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-header">
+                        <h3>Plataforma de Analytics</h3>
+                        <div class="company">Fintech</div>
+                    </div>
+                    <div class="case-body">
+                        <div class="case-result">+300% velocidade</div>
+                        <p>Modernização da arquitetura de dados reduziu tempo de geração de relatórios de 8h para 15 minutos, habilitando decisões em tempo real.</p>
+                    </div>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-header">
+                        <h3>Governança de Dados</h3>
+                        <div class="company">Saúde</div>
+                    </div>
+                    <div class="case-body">
+                        <div class="case-result">100% LGPD</div>
+                        <p>Implementação completa de framework de governança, catalogação de ativos e conformidade regulatória para rede de hospitais.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industries Section -->
+    <section class="industries" id="segmentos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Especialistas nos principais segmentos</h2>
+                <p>Entendemos as particularidades de cada setor e oferecemos soluções que realmente fazem a diferença.</p>
+            </div>
+            <div class="industries-grid">
+                <div class="industry-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Varejo & E-commerce</h3>
+                </div>
+                <div class="industry-item">
+                    <i class="fas fa-university"></i>
+                    <h3>Financeiro & Fintechs</h3>
+                </div>
+                <div class="industry-item">
+                    <i class="fas fa-industry"></i>
+                    <h3>Indústria & Manufatura</h3>
+                </div>
+                <div class="industry-item">
+                    <i class="fas fa-heartbeat"></i>
+                    <h3>Saúde & Farmacêutico</h3>
+                </div>
+                <div class="industry-item">
+                    <i class="fas fa-truck"></i>
+                    <h3>Logística & Transporte</h3>
+                </div>
+                <div class="industry-item">
+                    <i class="fas fa-seedling"></i>
+                    <h3>Agronegócio</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="contato">
+        <div class="container">
+            <h2>Pronto para transformar seus dados?</h2>
+            <p>Entre em contato e descubra como a DataHub pode acelerar a jornada data-driven da sua empresa.</p>
+            <div class="cta-buttons">
+                <a href="mailto:contato@datahubconsulting.com.br" class="btn-white">Agende um horário</a>
+                <a href="https://wa.me/5511985358875" class="btn-whatsapp btn-outline">WhatsApp <i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">DataHub</div>
+                <p>Transformando dados em decisões estratégicas desde 2019. Sua parceira na jornada de transformação digital.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-medium-m"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Serviços</h4>
+                <ul>
+                    <li><a href="#">Data Strategy</a></li>
+                    <li><a href="#">Business Intelligence</a></li>
+                    <li><a href="#">Data Governance</a></li>
+                    <li><a href="#">Data Engineering</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Empresa</h4>
+                <ul>
+                    <li><a href="#">Sobre Nós</a></li>
+                    <li><a href="#">Carreiras</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Cases</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contato</h4>
+                <ul>
+                    <li><a href="mailto:davidoval74@gmail.com">davidoval74@gmail.com</a></li>
+                    <li><a href="tel:+551199999999">+55 11 9999-9999</a></li>
+                    <li><a href="#">São Paulo, SP</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DataHub Consultoria. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
