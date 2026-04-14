@@ -1,84 +1,111 @@
-# DataHub - Consultoria em Dados e Analytics
+# DataHub - Site Institucional
 
-Bem-vindo ao repositório do site da DataHub, uma empresa especializada em consultoria de dados e analytics.
+Site institucional da DataHub, desenvolvido com HTML, CSS e JavaScript puro.
 
-## Sobre o Projeto
+## Visao Geral
 
-Este é o site institucional da DataHub, desenvolvido com HTML, CSS e JavaScript puro. O site apresenta nossos serviços, cases de sucesso, estatísticas e informações de contato. O projeto está atualizado para 2026.
+O projeto apresenta:
+- Proposta de valor da empresa
+- Servicos e segmentos de atuacao
+- Cases e indicadores
+- Bloco de contato com e-mail e WhatsApp
+- Hero com video corporativo
 
 ## Estrutura do Projeto
 
-```
+```text
 c:\Datahub\
-├── index.html          # Página principal
+├── index.html
 ├── css/
-│   └── styles.css      # Estilos CSS
+│   └── styles.css
 ├── js/
-│   └── script.js       # Scripts JavaScript
-├── README.md           # Documentação do projeto
-└── .gitignore          # Arquivos ignorados pelo Git
+│   └── script.js
+├── png/
+│   ├── datahub-logo.png
+│   └── favicon.ico
+├── Video/
+│   └── DataHub_Consulting_corporate_202604141558.mp4
+├── .gitignore
+└── README.md
 ```
 
-## Principais Atualizações (2026)
+## Stack
 
-- Rodapé atualizado para `© 2026`.
-- Botão `Fale Conosco` com navegação interna para `#contato`.
-- Botão `WhatsApp` adicionado na barra de navegação com link para `https://wa.me/5511999999999`.
-- Estrutura da navegação aprimorada com `nav-actions` para melhor posição e espaçamento.
-- CSS modularizado em `css/styles.css`.
-- JS separado em `js/script.js` para comportamento da página (scroll suave, animação, header fixo).
+- HTML5
+- CSS3 (Flexbox, Grid, media queries)
+- JavaScript vanilla
+- Font Awesome
+- Google Fonts
 
-## Como Visualizar
+## Como Rodar Localmente
 
-### Opção 1: Abrir diretamente no navegador
-1. Clone ou baixe este repositório
-2. Abra o arquivo `index.html` em qualquer navegador moderno
+### Opcao 1: abrir direto
+1. Abra o arquivo `index.html` no navegador.
 
-### Opção 2: Usar um servidor local (recomendado)
-Para uma experiência completa, especialmente se houver recursos que dependem de um servidor:
+### Opcao 2: servidor local (recomendado)
 
 ```bash
-# Usando Python (se instalado)
+# Python
 python -m http.server 8000
 
-# Ou usando Node.js (se instalado)
+# Node.js
 npx http-server
-
-# Então acesse http://localhost:8000
 ```
 
-## Tecnologias Utilizadas
+Acesse `http://localhost:8000`.
 
-- **HTML5**: Estrutura semântica
-- **CSS3**: Estilos modernos com variáveis CSS, Flexbox e Grid
-- **JavaScript**: Interatividade e animações
-- **Font Awesome**: Ícones
-- **Google Fonts**: Tipografia Inter
+## Fluxo de Deploy
 
-## Funcionalidades
+### 1) Fluxo Git (local -> GitHub)
 
-- Design responsivo para desktop e mobile
-- Navegação suave entre seções
-- Animações de scroll
-- Efeitos visuais modernos
-- Barra de navegação fixa
-- Botões de contato (Fale Conosco + WhatsApp)
+```bash
+git status
+git add .
+git commit -m "chore: atualiza site institucional"
+git push origin main
+```
 
-## Desenvolvimento
+### 2) Publicacao no GitHub Pages
 
-Para contribuir ou modificar o site:
+1. Abra o repositorio no GitHub.
+2. Va em `Settings` -> `Pages`.
+3. Em `Build and deployment`:
+	- `Source`: `Deploy from a branch`
+	- `Branch`: `main`
+	- `Folder`: `/ (root)`
+4. Salve e aguarde o deploy.
+5. A URL publica sera exibida na mesma tela do Pages.
 
-1. Faça um fork do repositório
-2. Crie uma branch para suas modificações
-3. Faça commit das mudanças
-4. Abra um Pull Request
+### 3) Dominio proprio (opcional)
 
-## Contato
+1. No mesmo menu `Pages`, configure `Custom domain`.
+2. Crie os registros DNS no seu provedor (A/CNAME) apontando para o GitHub Pages.
+3. Ative `Enforce HTTPS` quando disponivel.
 
-- Email: davidoval74@gmail.com
-- Telefone: +55 11 9999-9999
-- Localização: São Paulo, SP
+## Checklist Pre-Deploy
 
-## Licença
+- Validar contatos no HTML
+- Confirmar caminho do video do hero
+- Testar navegacao mobile
+- Rodar revisao visual em desktop e mobile
+- Confirmar que nao ha arquivos temporarios desnecessarios no commit
 
-Este projeto é propriedade da DataHub Consultoria. Todos os direitos reservados.
+## Rollback Rapido
+
+Se precisar voltar a versao anterior:
+
+```bash
+git log --oneline
+git revert <hash_do_commit>
+git push origin main
+```
+
+## Contato Oficial
+
+- Email: contato@datahubconsuilting.com.br
+- WhatsApp: +55 11 92562-1121
+- Localizacao: Sao Paulo, SP
+
+## Licenca
+
+Projeto proprietario da DataHub. Todos os direitos reservados.
