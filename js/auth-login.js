@@ -6,11 +6,10 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const rememberMeInput = document.getElementById("rememberMe");
 const feedback = document.getElementById("feedback");
-const loginEndpoint = new URL("../api/auth/login.php", window.location.href).href;
-const appBaseFromLogin = window.location.pathname.includes("/login/")
-    ? window.location.pathname.split("/login/")[0]
-    : "";
-const dashboardUrl = `${window.location.origin}${appBaseFromLogin}/usuario/`;
+const appBaseFromLogin = window.location.pathname.replace(/\/login(?:\/index\.html)?\/?$/, "");
+const appOrigin = `${window.location.origin}${appBaseFromLogin}`;
+const loginEndpoint = `${appOrigin}/api/auth/login.php`;
+const dashboardUrl = "https://datahubconsulting.com.br/usuario/";
 
 const setFeedback = (message, type) => {
     feedback.textContent = message;
@@ -97,9 +96,9 @@ const submitLogin = async (event) => {
             localStorage.removeItem(REMEMBER_EMAIL_KEY);
         }
 
-        setFeedback("Login realizado com sucesso. Redirecionando...", "success");
+        setFeedback(`Login realizado com sucesso. Redirecionando para ${dashboardUrl}`, "success");
         setTimeout(() => {
-            window.location.assign(dashboardUrl);
+            window.location.replace(dashboardUrl);
         }, 350);
     } catch (_error) {
         setFeedback(`Nao foi possivel conectar a API (${loginEndpoint}).`, "error");

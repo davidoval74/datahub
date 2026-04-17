@@ -4,12 +4,11 @@ const logoutBtn = document.getElementById("logoutBtn");
 const toolButtons = Array.from(document.querySelectorAll(".tool-item"));
 const toolCards = Array.from(document.querySelectorAll(".tool-card"));
 const contentRoot = document.querySelector(".user-content");
-const meEndpoint = new URL("../api/auth/me.php", window.location.href).href;
-const logoutEndpoint = new URL("../api/auth/logout.php", window.location.href).href;
-const appBaseFromUser = window.location.pathname.includes("/usuario/")
-    ? window.location.pathname.split("/usuario/")[0]
-    : "";
-const loginUrl = `${window.location.origin}${appBaseFromUser}/login/`;
+const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/index\.html)?\/?$/, "");
+const appOrigin = `${window.location.origin}${appBaseFromUser}`;
+const meEndpoint = `${appOrigin}/api/auth/me.php`;
+const logoutEndpoint = `${appOrigin}/api/auth/logout.php`;
+const loginUrl = `${appOrigin}/login/`;
 
 const setActiveTool = (tool) => {
     toolButtons.forEach((button) => {
