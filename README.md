@@ -1,80 +1,127 @@
-# DataHub - Consultoria em Dados e Analytics
+# DataHub
 
-Bem-vindo ao repositório do site da DataHub, uma empresa especializada em consultoria de dados e analytics.
+Site institucional da DataHub com autenticacao em PHP/MySQL para hospedagem cPanel.
 
-## Sobre o Projeto
+## Visao geral
 
-Este projeto agora possui:
-- Site institucional (HTML/CSS/JS)
-- Ambiente de login e cadastro em rotas com `index.html`
-- API em PHP
-- Banco MySQL com estrutura compativel com cPanel
+O projeto contem duas frentes principais:
 
-## Estrutura do Projeto
+- site institucional estatico em HTML, CSS e JavaScript
+- area autenticada com cadastro, login, sessao PHP e dashboard inicial do usuario
 
-```
+## Arquitetura atual
+
+- home institucional em `index.html`
+- rotas por pasta com `index.html` para compatibilidade com cPanel
+- API em PHP na pasta `api/`
+- banco MySQL com tabela `users`
+- sessao autenticada mantida com `$_SESSION['auth_user']`
+
+## Estrutura do projeto
+
+```text
 c:\Datahub\
-├── index.html          # Página principal
-├── login/              # Rota /login/
+├── index.html
+├── login.html                  # redireciona para /login/
+├── login/
 │   └── index.html
-├── cadastro/           # Rota /cadastro/
+├── cadastro/
+│   └── index.html
+├── usuario/
 │   └── index.html
 ├── api/
-│   ├── config.php      # Config local do banco (cPanel)
+│   ├── bootstrap.php
 │   ├── config.example.php
 │   ├── db.php
-│   ├── bootstrap.php
+│   ├── health.php
 │   └── auth/
-│       ├── register.php
 │       ├── login.php
 │       ├── logout.php
-│       └── me.php
-├── db/
-│   └── schema.sql      # Estrutura SQL para MySQL/cPanel
+│       ├── me.php
+│       └── register.php
 ├── css/
-│   ├── styles.css      # Estilos da home
-│   └── auth.css        # Estilos do login/cadastro
+│   ├── auth.css
+│   ├── styles.css
+│   └── user.css
 ├── js/
-│   ├── script.js       # Scripts da home
-│   ├── auth-login.js   # Front-end de login
-│   └── auth-register.js# Front-end de cadastro
-├── README.md           # Documentação do projeto
-└── .gitignore          # Arquivos ignorados pelo Git
+│   ├── auth-login.js
+│   ├── auth-register.js
+│   ├── script.js
+│   └── user-dashboard.js
+├── db/
+│   └── schema.sql
+├── png/
+├── Video/
+└── .gitignore
 ```
 
-## Principais Atualizações (2026)
+## Rotas
 
-- Rodapé atualizado para `© 2026`.
-- Botão `Fale Conosco` com navegação interna para `#contato`.
-- Botão `WhatsApp` adicionado na barra de navegação com link para `https://wa.me/5511925621121`.
-- Estrutura da navegação aprimorada com `nav-actions` para melhor posição e espaçamento.
-- CSS modularizado em `css/styles.css`.
-- JS separado em `js/script.js` para comportamento da página (scroll suave, animação, header fixo).
+- `/` -> home institucional
+- `/login/` -> tela de login
+- `/cadastro/` -> tela de cadastro
+- `/usuario/` -> area autenticada inicial
+- `/api/auth/login.php` -> autentica usuario
+- `/api/auth/register.php` -> cria usuario
+- `/api/auth/me.php` -> retorna a sessao atual
+- `/api/auth/logout.php` -> encerra a sessao
+- `/api/health.php` -> diagnostico de ambiente
 
-## Como Visualizar
+## Fluxo de autenticacao
 
-## Rotas (hospedagem)
+### Cadastro
 
-As paginas de autenticacao seguem o padrao de rota em pasta com `index.html`:
-- `/login/` -> `login/index.html`
-- `/cadastro/` -> `cadastro/index.html`
+1. Usuario acessa `/cadastro/`.
+2. O front valida nome, email, senha e confirmacao.
+3. A API grava o usuario na tabela `users`.
+4. A sessao `auth_user` e aberta no backend.
+5. O front redireciona para `/login/`.
 
-Isso e ideal para hospedagem em cPanel.
+### Login
 
-## Banco de Dados no cPanel
+1. Usuario acessa `/login/`.
+2. O front envia `email` e `password` para `/api/auth/login.php`.
+3. A API valida email, senha, status e hash.
+4. A sessao `auth_user` e criada.
+5. O front redireciona para `https://datahubconsulting.com.br/usuario/`.
 
-1. Crie um banco MySQL no cPanel.
-2. Crie um usuario MySQL e associe ao banco com privilegios.
+### Dashboard do usuario
+
+1. A pagina `/usuario/` chama `/api/auth/me.php`.
+2. Se a sessao existir, os dados do usuario sao exibidos.
+3. Se a sessao falhar, a pagina mostra aviso de autenticacao.
+4. O logout chama `/api/auth/logout.php`.
+
+## Banco de dados
+
+Importe `db/schema.sql` no MySQL do cPanel. Estrutura atual:
+
+- `users`
+	- `id`
+	- `name`
+	- `email` com indice unico
+	- `password_hash`
+	- `status`
+	- `created_at`
+	- `updated_at`
+
+## Configuracao no cPanel
+
+1. Crie o banco MySQL.
+2. Crie um usuario MySQL com permissao total no banco.
 3. Importe `db/schema.sql` no phpMyAdmin.
-4. Preencha `api/config.php` com os dados reais do cPanel:
-	- host (normalmente `localhost`)
-	- db_name (padrao `usuariocpanel_nomedobanco`)
-	- db_user (padrao `usuariocpanel_nomedeusuario`)
-	- db_pass
+4. Copie `api/config.example.php` para `api/config.php`.
+5. Preencha:
+	 - `db_host`
+	 - `db_name`
+	 - `db_user`
+	 - `db_pass`
+	 - `db_port`
+	 - `session_name`
 
-## Como testar localmente
+## Execucao local
 
-Use um servidor PHP local apontando para a pasta do projeto:
+Use um servidor PHP na raiz do projeto:
 
 ```bash
 php -S localhost:8000
@@ -82,42 +129,71 @@ php -S localhost:8000
 
 Depois acesse `http://localhost:8000`.
 
-## Tecnologias Utilizadas
+## Observacoes importantes
 
-- **HTML5**: Estrutura semântica
-- **CSS3**: Estilos modernos com variáveis CSS, Flexbox e Grid
-- **JavaScript**: Interatividade no front-end
-- **PHP**: Endpoints de autenticacao
-- **MySQL**: Persistencia de usuarios (cPanel)
-- **Font Awesome**: Ícones
-- **Google Fonts**: Tipografia Inter
+- `api/config.php` nao vai para o Git e deve ser criado manualmente em cada ambiente.
+- `js/auth-login.js` esta com redirecionamento final hardcoded para `https://datahubconsulting.com.br/usuario/`.
+- Isso resolve o deploy atual em producao, mas nao e ideal para homologacao ou teste local.
+- `api/health.php` deve ser removido ou protegido apos a estabilizacao do ambiente.
 
-## Funcionalidades
+## Cache e deploy
 
-- Design responsivo para desktop e mobile
-- Navegação suave entre seções
-- Animações de scroll
-- Efeitos visuais modernos
-- Barra de navegação fixa
-- Botões de contato (Fale Conosco + WhatsApp)
-- Cadastro de usuario (`/api/auth/register.php`)
-- Login com sessao (`/api/auth/login.php`)
+- login e dashboard usam query string de versao nos scripts para reduzir problema de cache.
+- se o navegador mantiver comportamento antigo apos deploy, faca refresh forcado
+- em hospedagens com cache intermediario, limpe o cache no painel
 
-## Desenvolvimento
+## Troubleshooting
 
-Para contribuir ou modificar o site:
+### Erro de configuracao
 
-1. Faça um fork do repositório
-2. Crie uma branch para suas modificações
-3. Faça commit das mudanças
-4. Abra um Pull Request
+Se a API retornar erro de configuracao:
 
-## Contato
+- confirme que `api/config.php` existe no servidor
+- confirme que o arquivo nao ficou com placeholders
+- confirme usuario, senha e nome do banco
 
-- Email: davidoval74@gmail.com
-- Telefone: +55 11 9999-9999
-- Localização: São Paulo, SP
+### Erro de conexao com banco
 
-## Licença
+- valide se a extensao `mysqli` esta habilitada
+- confirme host, usuario, senha e nome do banco
+- confirme se a tabela `users` foi importada
 
-Este projeto é propriedade da DataHub Consultoria. Todos os direitos reservados.
+### Login funciona mas dashboard nao abre
+
+- valide se o deploy incluiu a pasta `usuario/`
+- valide se `https://datahubconsulting.com.br/usuario/` responde corretamente
+- valide se a versao nova de `js/auth-login.js` foi carregada
+
+### Sessao nao autenticada na dashboard
+
+- confirme se login e dashboard estao no mesmo dominio
+- teste `/api/auth/me.php` imediatamente apos o login
+- confirme se cookies de sessao nao estao sendo bloqueados
+
+## Melhorias recomendadas
+
+- remover o redirect hardcoded e parametrizar a URL base por ambiente
+- proteger ou remover `api/health.php` em producao
+- substituir links placeholder `#` da home por destinos reais
+- criar paginas reais para cada ferramenta da area do usuario
+- adicionar logs de erro do lado servidor
+
+## Tecnologias
+
+- HTML5
+- CSS3
+- JavaScript vanilla
+- PHP
+- MySQL
+- Font Awesome
+- Google Fonts
+
+## Seguranca
+
+- senhas sao persistidas com `password_hash`
+- existe validacao no front e no backend
+- `api/config.php` esta ignorado no Git
+
+## Licenca
+
+Projeto privado da DataHub.

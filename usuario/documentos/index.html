@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataHub | Documentos</title>
+    <link rel="icon" href="../../png/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/user.css">
+</head>
+<body class="auth-pending" data-active-tool="documentos" data-page-title="Documentos" data-page-description="Rota protegida para documentos e anexos do cliente.">
+    <main class="user-shell">
+        <div class="sidebar-backdrop" data-action="close-sidebar"></div>
+
+        <aside class="user-sidebar" id="userSidebar">
+            <div class="sidebar-top">
+                <a href="../../" class="brand-link" aria-label="Voltar para home">
+                    <img src="../../png/datahub-logo.png" alt="DataHub" onerror="this.style.display='none';">
+                    <strong>DataHub</strong>
+                </a>
+                <button class="sidebar-toggle sidebar-toggle-inline" type="button" data-action="toggle-sidebar" aria-label="Encolher menu lateral">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <p class="sidebar-label">Menu de ferramentas</p>
+            <nav class="tool-nav" aria-label="Ferramentas da area do usuario">
+                <a class="tool-item" data-tool="dashboard" data-route="dashboard" href="../"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+                <a class="tool-item" data-tool="relatorios" data-route="relatorios" href="../relatorios/"><i class="fa-regular fa-file-lines"></i><span>Relatorios</span></a>
+                <a class="tool-item" data-tool="documentos" data-route="documentos" href="./"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></a>
+                <a class="tool-item" data-tool="tarefas" data-route="tarefas" href="../tarefas/"><i class="fa-solid fa-list-check"></i><span>Tarefas</span></a>
+                <a class="tool-item" data-tool="suporte" data-route="suporte" href="../suporte/"><i class="fa-regular fa-life-ring"></i><span>Suporte</span></a>
+            </nav>
+
+            <button id="logoutBtn" class="logout-btn" type="button">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Sair</span>
+            </button>
+        </aside>
+
+        <section class="user-content">
+            <header class="user-header">
+                <div class="user-header-left">
+                    <button class="sidebar-toggle" type="button" data-action="toggle-sidebar" aria-label="Abrir menu lateral">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div>
+                        <h1 id="pageTitle">Documentos</h1>
+                        <p id="welcomeText">Validando sua sessao...</p>
+                    </div>
+                </div>
+                <span class="status-pill">Sessao ativa</span>
+            </header>
+
+            <section class="page-hero">
+                <div>
+                    <p class="eyebrow">Modulo temporario</p>
+                    <h2>Documentos</h2>
+                    <p id="pageDescription">Rota protegida para documentos e anexos do cliente.</p>
+                </div>
+            </section>
+
+            <section class="placeholder-card">
+                <h3>Ola mundo</h3>
+                <p>Esta tela pode receber contratos, anexos e arquivos do cliente quando o modulo final for implementado.</p>
+                <span class="hello-world"><i class="fa-regular fa-folder-open"></i>Ola mundo</span>
+            </section>
+        </section>
+    </main>
+
+    <script src="../../js/user-dashboard.js?v=20260417-5"></script>
+</body>
+</html>
