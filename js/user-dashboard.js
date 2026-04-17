@@ -1,34 +1,14 @@
 const LOGIN_STORAGE_KEY = "datahub.auth";
-const SIDEBAR_STATE_KEY = "datahub.userSidebarCollapsed";
-
-const body = document.body;
-const shell = document.querySelector(".user-shell");
 const welcomeText = document.getElementById("welcomeText");
 const logoutBtn = document.getElementById("logoutBtn");
-const pageTitle = document.getElementById("pageTitle");
-const pageDescription = document.getElementById("pageDescription");
-const contentRoot = document.querySelector(".user-content");
 const toolButtons = Array.from(document.querySelectorAll(".tool-item"));
 const toolCards = Array.from(document.querySelectorAll(".tool-card"));
-const routeLinks = Array.from(document.querySelectorAll("[data-route]"));
-const toggleButtons = Array.from(document.querySelectorAll("[data-action='toggle-sidebar']"));
-const closeButtons = Array.from(document.querySelectorAll("[data-action='close-sidebar']"));
-
-const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/(?:relatorios|documentos|tarefas|suporte))?(?:\/index\.html)?\/?$/, "");
+const contentRoot = document.querySelector(".user-content");
+const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/index\.html)?\/?$/, "");
 const appOrigin = `${window.location.origin}${appBaseFromUser}`;
 const meEndpoint = `${appOrigin}/api/auth/me.php`;
 const logoutEndpoint = `${appOrigin}/api/auth/logout.php`;
 const loginUrl = `${appOrigin}/login/`;
-
-const routeMap = {
-    dashboard: `${appOrigin}/usuario/`,
-    relatorios: `${appOrigin}/usuario/relatorios/`,
-    documentos: `${appOrigin}/usuario/documentos/`,
-    tarefas: `${appOrigin}/usuario/tarefas/`,
-    suporte: `${appOrigin}/usuario/suporte/`
-};
-
-const currentTool = body.dataset.activeTool || "dashboard";
 
 const setActiveTool = (tool) => {
     toolButtons.forEach((button) => {
@@ -36,70 +16,35 @@ const setActiveTool = (tool) => {
     });
 
     toolCards.forEach((card) => {
-        card.classList.toggle("highlight", card.dataset.panel === tool);
-    });
-};
-
-const hydrateRouteLinks = () => {
-    routeLinks.forEach((element) => {
-        const route = element.dataset.route;
-        if (routeMap[route]) {
-            element.setAttribute("href", routeMap[route]);
+        const shouldHighlight = card.dataset.panel === tool;
+        card.classList.toggle("highlight", shouldHighlight);
+        if (shouldHighlight) {
+            card.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
     });
 };
 
-const applyPageMeta = () => {
-    if (pageTitle && body.dataset.pageTitle) {
-        pageTitle.textContent = body.dataset.pageTitle;
-    }
-
-    if (pageDescription && body.dataset.pageDescription) {
-        pageDescription.textContent = body.dataset.pageDescription;
-    }
-};
-
-const applyDesktopSidebarState = (collapsed) => {
-    shell.classList.toggle("sidebar-collapsed", collapsed);
-    localStorage.setItem(SIDEBAR_STATE_KEY, collapsed ? "1" : "0");
-};
-
-const toggleSidebar = () => {
-    if (window.innerWidth <= 920) {
-        shell.classList.toggle("sidebar-open");
-        return;
-    }
-
-    const collapsed = !shell.classList.contains("sidebar-collapsed");
-    applyDesktopSidebarState(collapsed);
-};
-
-const syncSidebarState = () => {
-    if (window.innerWidth <= 920) {
-        shell.classList.remove("sidebar-collapsed");
-        return;
-    }
-
-    shell.classList.remove("sidebar-open");
-    const saved = localStorage.getItem(SIDEBAR_STATE_KEY) === "1";
-    applyDesktopSidebarState(saved);
-};
-
 const renderError = (message) => {
-    const existing = contentRoot.querySelector(".error-banner");
-    if (existing) {
-        existing.remove();
-    }
-
     const banner = document.createElement("p");
     banner.className = "error-banner";
     banner.textContent = message;
     contentRoot.prepend(banner);
 };
 
-const redirectToLogin = () => {
-    localStorage.removeItem(LOGIN_STORAGE_KEY);
-    window.location.replace(loginUrl);
+const renderAuthRequired = (message) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "error-banner";
+
+    const text = document.createElement("p");
+    text.textContent = message;
+
+    const action = document.createElement("a");
+    action.href = loginUrl;
+    action.textContent = "Ir para login";
+    action.className = "auth-action-link";
+
+    wrapper.append(text, action);
+    contentRoot.prepend(wrapper);
 };
 
 const loadSession = async () => {
@@ -110,19 +55,18 @@ const loadSession = async () => {
         });
 
         if (!response.ok) {
-            redirectToLogin();
+            localStorage.removeItem(LOGIN_STORAGE_KEY);
+            renderAuthRequired("Sua sessao nao esta ativa nesta pagina.");
             return;
         }
 
         const result = await response.json();
         if (!result || !result.user) {
-            redirectToLogin();
+            renderError("Sessao invalida. Atualize a pagina.");
             return;
         }
 
-        if (welcomeText) {
-            welcomeText.textContent = `Bem-vindo, ${result.user.name}. Acesso liberado para a rota ${currentTool}.`;
-        }
+        welcomeText.textContent = `Bem-vindo, ${result.user.name}. Escolha uma ferramenta para continuar.`;
 
         const sessionPayload = {
             isAuthenticated: true,
@@ -132,10 +76,8 @@ const loadSession = async () => {
             loginAt: new Date().toISOString()
         };
         localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(sessionPayload));
-        body.classList.remove("auth-pending");
     } catch (_error) {
-        renderError("Nao foi possivel validar sua sessao. Redirecionando para login...");
-        setTimeout(redirectToLogin, 250);
+        renderError("Nao foi possivel validar sua sessao com a API.");
     }
 };
 
@@ -146,26 +88,15 @@ const performLogout = async () => {
             credentials: "same-origin"
         });
     } finally {
-        redirectToLogin();
+        localStorage.removeItem(LOGIN_STORAGE_KEY);
+        window.location.href = loginUrl;
     }
 };
 
-toggleButtons.forEach((button) => {
-    button.addEventListener("click", toggleSidebar);
+toolButtons.forEach((button) => {
+    button.addEventListener("click", () => setActiveTool(button.dataset.tool));
 });
 
-closeButtons.forEach((button) => {
-    button.addEventListener("click", () => shell.classList.remove("sidebar-open"));
-});
-
-window.addEventListener("resize", syncSidebarState);
-
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", performLogout);
-}
-
-hydrateRouteLinks();
-applyPageMeta();
-setActiveTool(currentTool);
-syncSidebarState();
+logoutBtn.addEventListener("click", performLogout);
+setActiveTool("dashboard");
 loadSession();
