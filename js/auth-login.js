@@ -93,7 +93,7 @@ const submitLogin = async (event) => {
 
         setFeedback("Login realizado com sucesso. Redirecionando...", "success");
         setTimeout(() => {
-            window.location.href = "../";
+            window.location.href = "../usuario/";
         }, 700);
     } catch (_error) {
         setFeedback(`Nao foi possivel conectar a API (${loginEndpoint}).`, "error");
