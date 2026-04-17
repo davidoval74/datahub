@@ -26,7 +26,8 @@ try {
     $stmt = $mysqli->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
     $stmt->bind_param('s', $email);
     $stmt->execute();
-    $existing = $stmt->get_result()->fetch_assoc();
+    $stmt->bind_result($existingId);
+    $existing = $stmt->fetch();
     $stmt->close();
 
     if ($existing) {

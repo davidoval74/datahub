@@ -17,21 +17,22 @@ try {
     $stmt = $mysqli->prepare('SELECT id, name, email, password_hash, status FROM users WHERE email = ? LIMIT 1');
     $stmt->bind_param('s', $email);
     $stmt->execute();
-    $user = $stmt->get_result()->fetch_assoc();
+    $stmt->bind_result($userId, $userName, $userEmail, $passwordHash, $status);
+    $found = $stmt->fetch();
     $stmt->close();
 
-    if (!$user || $user['status'] !== 'active') {
+    if (!$found || $status !== 'active') {
         send_json(401, ['ok' => false, 'message' => 'Email ou senha incorretos.']);
     }
 
-    if (!password_verify($password, $user['password_hash'])) {
+    if (!password_verify($password, $passwordHash)) {
         send_json(401, ['ok' => false, 'message' => 'Email ou senha incorretos.']);
     }
 
     $_SESSION['auth_user'] = [
-        'id' => (int)$user['id'],
-        'name' => $user['name'],
-        'email' => $user['email']
+        'id' => (int)$userId,
+        'name' => $userName,
+        'email' => $userEmail
     ];
 
     send_json(200, [

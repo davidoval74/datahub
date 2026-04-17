@@ -4,6 +4,7 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 const feedback = document.getElementById("feedback");
+const registerEndpoint = new URL("../api/auth/register.php", window.location.href).href;
 
 const setFeedback = (message, type) => {
     feedback.textContent = message;
@@ -44,7 +45,7 @@ const submitRegister = async (event) => {
     }
 
     try {
-        const response = await fetch("../api/auth/register.php", {
+        const response = await fetch(registerEndpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -53,10 +54,23 @@ const submitRegister = async (event) => {
             body: JSON.stringify({ name, email, password })
         });
 
-        const result = await response.json();
+        const rawBody = await response.text();
+        let result = null;
+
+        try {
+            result = JSON.parse(rawBody);
+        } catch (_parseError) {
+            result = null;
+        }
 
         if (!response.ok) {
-            setFeedback(result.message || "Falha no cadastro.", "error");
+            const fallbackMessage = `Erro ${response.status} no cadastro.`;
+            setFeedback((result && result.message) || fallbackMessage, "error");
+            return;
+        }
+
+        if (!result || !result.ok) {
+            setFeedback("A API respondeu em formato inesperado.", "error");
             return;
         }
 
@@ -65,7 +79,7 @@ const submitRegister = async (event) => {
             window.location.href = "../login/";
         }, 900);
     } catch (_error) {
-        setFeedback("Nao foi possivel conectar a API.", "error");
+        setFeedback(`Nao foi possivel conectar a API (${registerEndpoint}).`, "error");
     }
 };
 
