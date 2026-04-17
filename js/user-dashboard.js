@@ -6,6 +6,10 @@ const toolCards = Array.from(document.querySelectorAll(".tool-card"));
 const contentRoot = document.querySelector(".user-content");
 const meEndpoint = new URL("../api/auth/me.php", window.location.href).href;
 const logoutEndpoint = new URL("../api/auth/logout.php", window.location.href).href;
+const appBaseFromUser = window.location.pathname.includes("/usuario/")
+    ? window.location.pathname.split("/usuario/")[0]
+    : "";
+const loginUrl = `${window.location.origin}${appBaseFromUser}/login/`;
 
 const setActiveTool = (tool) => {
     toolButtons.forEach((button) => {
@@ -28,6 +32,22 @@ const renderError = (message) => {
     contentRoot.prepend(banner);
 };
 
+const renderAuthRequired = (message) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "error-banner";
+
+    const text = document.createElement("p");
+    text.textContent = message;
+
+    const action = document.createElement("a");
+    action.href = loginUrl;
+    action.textContent = "Ir para login";
+    action.className = "auth-action-link";
+
+    wrapper.append(text, action);
+    contentRoot.prepend(wrapper);
+};
+
 const loadSession = async () => {
     try {
         const response = await fetch(meEndpoint, {
@@ -37,7 +57,7 @@ const loadSession = async () => {
 
         if (!response.ok) {
             localStorage.removeItem(LOGIN_STORAGE_KEY);
-            window.location.href = "../login/";
+            renderAuthRequired("Sua sessao nao esta ativa nesta pagina.");
             return;
         }
 
@@ -70,7 +90,7 @@ const performLogout = async () => {
         });
     } finally {
         localStorage.removeItem(LOGIN_STORAGE_KEY);
-        window.location.href = "../login/";
+        window.location.href = loginUrl;
     }
 };
 

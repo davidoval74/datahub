@@ -208,6 +208,15 @@ body {
     font-weight: 600;
 }
 
+.auth-action-link {
+    margin-top: 0.45rem;
+    display: inline-block;
+    color: #8e1212;
+    font-weight: 800;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(142, 18, 18, 0.38);
+}
+
 @media (max-width: 920px) {
     .user-shell {
         grid-template-columns: 1fr;

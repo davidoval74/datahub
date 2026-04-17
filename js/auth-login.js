@@ -7,7 +7,10 @@ const passwordInput = document.getElementById("password");
 const rememberMeInput = document.getElementById("rememberMe");
 const feedback = document.getElementById("feedback");
 const loginEndpoint = new URL("../api/auth/login.php", window.location.href).href;
-const dashboardUrl = new URL("../usuario/", window.location.href).href;
+const appBaseFromLogin = window.location.pathname.includes("/login/")
+    ? window.location.pathname.split("/login/")[0]
+    : "";
+const dashboardUrl = `${window.location.origin}${appBaseFromLogin}/usuario/`;
 
 const setFeedback = (message, type) => {
     feedback.textContent = message;
