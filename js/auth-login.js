@@ -7,6 +7,7 @@ const passwordInput = document.getElementById("password");
 const rememberMeInput = document.getElementById("rememberMe");
 const feedback = document.getElementById("feedback");
 const loginEndpoint = new URL("../api/auth/login.php", window.location.href).href;
+const dashboardUrl = new URL("../usuario/", window.location.href).href;
 
 const setFeedback = (message, type) => {
     feedback.textContent = message;
@@ -31,9 +32,11 @@ const saveSession = (user) => {
 
 const hydrateRememberedEmail = () => {
     const remembered = localStorage.getItem(REMEMBER_EMAIL_KEY);
-    if (remembered) {
+    if (remembered && emailInput) {
         emailInput.value = remembered;
-        rememberMeInput.checked = true;
+        if (rememberMeInput) {
+            rememberMeInput.checked = true;
+        }
     }
 };
 
@@ -85,20 +88,22 @@ const submitLogin = async (event) => {
 
         saveSession(result.user);
 
-        if (rememberMeInput.checked) {
+        if (rememberMeInput && rememberMeInput.checked) {
             localStorage.setItem(REMEMBER_EMAIL_KEY, email);
-        } else {
+        } else if (rememberMeInput) {
             localStorage.removeItem(REMEMBER_EMAIL_KEY);
         }
 
         setFeedback("Login realizado com sucesso. Redirecionando...", "success");
         setTimeout(() => {
-            window.location.href = "../usuario/";
-        }, 700);
+            window.location.assign(dashboardUrl);
+        }, 350);
     } catch (_error) {
         setFeedback(`Nao foi possivel conectar a API (${loginEndpoint}).`, "error");
     }
 };
 
 hydrateRememberedEmail();
-form.addEventListener("submit", submitLogin);
+if (form) {
+    form.addEventListener("submit", submitLogin);
+}
