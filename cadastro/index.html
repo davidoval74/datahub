@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataHub | Cadastro</title>
+    <link rel="icon" href="../png/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+    <main class="auth-layout">
+        <section class="auth-card" aria-labelledby="title-cadastro">
+            <div class="brand">
+                <a href="../" class="brand-link" aria-label="Voltar para home">
+                    <img src="../png/datahub-logo.png" alt="DataHub" onerror="this.style.display='none';">
+                    <strong>DataHub</strong>
+                </a>
+                <span class="badge">Cadastro</span>
+            </div>
+
+            <h1 id="title-cadastro">Criar nova conta</h1>
+            <p class="subtitle">Seu cadastro sera gravado no banco da aplicacao.</p>
+
+            <form id="registerForm" class="auth-form" novalidate>
+                <label for="name">Nome completo</label>
+                <div class="field">
+                    <i class="fa-regular fa-user"></i>
+                    <input id="name" type="text" name="name" placeholder="Nome e sobrenome" autocomplete="name" required>
+                </div>
+
+                <label for="email">Email</label>
+                <div class="field">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input id="email" type="email" name="email" placeholder="seuemail@empresa.com" autocomplete="email" required>
+                </div>
+
+                <label for="password">Senha</label>
+                <div class="field">
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="password" type="password" name="password" placeholder="Minimo 8 caracteres" autocomplete="new-password" required>
+                </div>
+
+                <label for="confirmPassword">Confirmar senha</label>
+                <div class="field">
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Repita a senha" autocomplete="new-password" required>
+                </div>
+
+                <button type="submit" class="btn-auth">Cadastrar</button>
+                <p id="feedback" class="feedback" aria-live="polite"></p>
+            </form>
+
+            <div class="card-footer">
+                Ja possui conta? <a class="link-inline" href="../login/">Entrar agora</a>
+            </div>
+        </section>
+
+        <aside class="auth-aside">
+            <h2>Onboarding de clientes DataHub</h2>
+            <p>Cadastre usuarios com rastreabilidade e padrao de persistencia MySQL no cPanel.</p>
+            <div class="auth-points">
+                <article>Tabela users com email unico</article>
+                <article>Validacao no front e no backend</article>
+                <article>Pronto para fluxo real de producao</article>
+            </div>
+        </aside>
+    </main>
+
+    <script src="../js/auth-register.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataHub | Login</title>
+    <link rel="icon" href="../png/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body class="login-page">
+    <main class="auth-layout">
+        <aside class="auth-aside">
+            <div class="aside-logo-wrap" aria-hidden="true">
+                <img src="../png/datahub-logo.png" alt="">
+            </div>
+            <h2>Data intelligence em ambiente seguro</h2>
+            <p>Centralize indicadores, entregas e documentos com autenticação robusta e experiência premium para seus clientes.</p>
+            <figure class="cloud-visual" aria-hidden="true">
+                <i class="fa-solid fa-cloud"></i>
+                <span class="cloud-dot cloud-dot-1"></span>
+                <span class="cloud-dot cloud-dot-2"></span>
+                <span class="cloud-dot cloud-dot-3"></span>
+            </figure>
+            <div class="auth-points">
+                <article><i class="fa-solid fa-shield-halved"></i><span>Login por sessao no servidor</span></article>
+                <article><i class="fa-solid fa-key"></i><span>Senha com hash e validacao dupla</span></article>
+                <article><i class="fa-solid fa-database"></i><span>Compativel com cPanel e MySQL</span></article>
+            </div>
+        </aside>
+
+        <section class="auth-card" aria-labelledby="title-login">
+            <div class="brand">
+                <a href="../" class="brand-link" aria-label="Voltar para home">
+                    <img src="../png/datahub-logo.png" alt="DataHub" onerror="this.style.display='none';">
+                    <strong>DataHub</strong>
+                </a>
+                <span class="badge">Cliente Login</span>
+            </div>
+
+            <h1 id="title-login">Acessar Area do Cliente</h1>
+            <p class="subtitle">Entre para visualizar dashboards, cronogramas e entregas da sua operacao.</p>
+
+            <form id="loginForm" class="auth-form" novalidate>
+                <label for="email">Email</label>
+                <div class="field">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input id="email" type="email" name="email" placeholder="seuemail@empresa.com" autocomplete="email" required>
+                </div>
+
+                <label for="password">Senha</label>
+                <div class="field">
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="password" type="password" name="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+                </div>
+
+                <div class="form-row">
+                    <label>
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <span>Lembrar email</span>
+                    </label>
+                    <a href="../cadastro/">Criar conta</a>
+                </div>
+
+                <button type="submit" class="btn-auth">Entrar</button>
+                <p id="feedback" class="feedback" aria-live="polite"></p>
+            </form>
+
+            <div class="card-footer">
+                Acesso gerenciado por API PHP + MySQL no padrao de hospedagem cPanel.
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/auth-login.js"></script>
+</body>
+</html>

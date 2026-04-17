@@ -644,14 +644,36 @@
             transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
             position: relative;
             z-index: 1;
+            overflow: hidden;
+            isolation: isolate;
+            --mx: 50%;
+            --my: 50%;
+            --glow-opacity: 0;
+            box-shadow: 0 8px 24px rgba(7, 31, 59, 0.2);
+        }
+
+        .cta .btn-white::before {
+            content: '';
+            position: absolute;
+            inset: -35%;
+            background: radial-gradient(circle at var(--mx) var(--my), rgba(0, 102, 255, 0.3), rgba(0, 212, 170, 0.22) 32%, rgba(255, 255, 255, 0) 65%);
+            opacity: var(--glow-opacity);
+            transition: opacity 220ms ease;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(2px);
         }
 
         .cta .btn-white:hover,
         .cta .btn-white.active-hover {
-            background: var(--gradient);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(0, 102, 255, 0.35);
+            background: white;
+            color: #0f3f85;
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 14px 34px rgba(7, 48, 112, 0.24), 0 0 0 1px rgba(0, 102, 255, 0.18);
+        }
+
+        .cta .btn-white.active-hover {
+            --glow-opacity: 1;
         }
 
         .cta-buttons {

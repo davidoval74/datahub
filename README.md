@@ -1,111 +1,123 @@
-# DataHub - Site Institucional
+# DataHub - Consultoria em Dados e Analytics
 
-Site institucional da DataHub, desenvolvido com HTML, CSS e JavaScript puro.
+Bem-vindo ao repositório do site da DataHub, uma empresa especializada em consultoria de dados e analytics.
 
-## Visao Geral
+## Sobre o Projeto
 
-O projeto apresenta:
-- Proposta de valor da empresa
-- Servicos e segmentos de atuacao
-- Cases e indicadores
-- Bloco de contato com e-mail e WhatsApp
-- Hero com video corporativo
+Este projeto agora possui:
+- Site institucional (HTML/CSS/JS)
+- Ambiente de login e cadastro em rotas com `index.html`
+- API em PHP
+- Banco MySQL com estrutura compativel com cPanel
 
 ## Estrutura do Projeto
 
-```text
+```
 c:\Datahub\
-├── index.html
+├── index.html          # Página principal
+├── login/              # Rota /login/
+│   └── index.html
+├── cadastro/           # Rota /cadastro/
+│   └── index.html
+├── api/
+│   ├── config.php      # Config local do banco (cPanel)
+│   ├── config.example.php
+│   ├── db.php
+│   ├── bootstrap.php
+│   └── auth/
+│       ├── register.php
+│       ├── login.php
+│       ├── logout.php
+│       └── me.php
+├── db/
+│   └── schema.sql      # Estrutura SQL para MySQL/cPanel
 ├── css/
-│   └── styles.css
+│   ├── styles.css      # Estilos da home
+│   └── auth.css        # Estilos do login/cadastro
 ├── js/
-│   └── script.js
-├── png/
-│   ├── datahub-logo.png
-│   └── favicon.ico
-├── Video/
-│   └── DataHub_Consulting_corporate_202604141558.mp4
-├── .gitignore
-└── README.md
+│   ├── script.js       # Scripts da home
+│   ├── auth-login.js   # Front-end de login
+│   └── auth-register.js# Front-end de cadastro
+├── README.md           # Documentação do projeto
+└── .gitignore          # Arquivos ignorados pelo Git
 ```
 
-## Stack
+## Principais Atualizações (2026)
 
-- HTML5
-- CSS3 (Flexbox, Grid, media queries)
-- JavaScript vanilla
-- Font Awesome
-- Google Fonts
+- Rodapé atualizado para `© 2026`.
+- Botão `Fale Conosco` com navegação interna para `#contato`.
+- Botão `WhatsApp` adicionado na barra de navegação com link para `https://wa.me/5511925621121`.
+- Estrutura da navegação aprimorada com `nav-actions` para melhor posição e espaçamento.
+- CSS modularizado em `css/styles.css`.
+- JS separado em `js/script.js` para comportamento da página (scroll suave, animação, header fixo).
 
-## Como Rodar Localmente
+## Como Visualizar
 
-### Opcao 1: abrir direto
-1. Abra o arquivo `index.html` no navegador.
+## Rotas (hospedagem)
 
-### Opcao 2: servidor local (recomendado)
+As paginas de autenticacao seguem o padrao de rota em pasta com `index.html`:
+- `/login/` -> `login/index.html`
+- `/cadastro/` -> `cadastro/index.html`
+
+Isso e ideal para hospedagem em cPanel.
+
+## Banco de Dados no cPanel
+
+1. Crie um banco MySQL no cPanel.
+2. Crie um usuario MySQL e associe ao banco com privilegios.
+3. Importe `db/schema.sql` no phpMyAdmin.
+4. Preencha `api/config.php` com os dados reais do cPanel:
+	- host (normalmente `localhost`)
+	- db_name (padrao `usuariocpanel_nomedobanco`)
+	- db_user (padrao `usuariocpanel_nomedeusuario`)
+	- db_pass
+
+## Como testar localmente
+
+Use um servidor PHP local apontando para a pasta do projeto:
 
 ```bash
-# Python
-python -m http.server 8000
-
-# Node.js
-npx http-server
+php -S localhost:8000
 ```
 
-Acesse `http://localhost:8000`.
+Depois acesse `http://localhost:8000`.
 
-## Fluxo de Deploy
+## Tecnologias Utilizadas
 
-### 1) Fluxo Git (local -> GitHub)
+- **HTML5**: Estrutura semântica
+- **CSS3**: Estilos modernos com variáveis CSS, Flexbox e Grid
+- **JavaScript**: Interatividade no front-end
+- **PHP**: Endpoints de autenticacao
+- **MySQL**: Persistencia de usuarios (cPanel)
+- **Font Awesome**: Ícones
+- **Google Fonts**: Tipografia Inter
 
-```bash
-git status
-git add .
-git commit -m "chore: atualiza site institucional"
-git push origin main
-```
+## Funcionalidades
 
-### 2) Publicacao no GitHub Pages
+- Design responsivo para desktop e mobile
+- Navegação suave entre seções
+- Animações de scroll
+- Efeitos visuais modernos
+- Barra de navegação fixa
+- Botões de contato (Fale Conosco + WhatsApp)
+- Cadastro de usuario (`/api/auth/register.php`)
+- Login com sessao (`/api/auth/login.php`)
 
-1. Abra o repositorio no GitHub.
-2. Va em `Settings` -> `Pages`.
-3. Em `Build and deployment`:
-	- `Source`: `Deploy from a branch`
-	- `Branch`: `main`
-	- `Folder`: `/ (root)`
-4. Salve e aguarde o deploy.
-5. A URL publica sera exibida na mesma tela do Pages.
+## Desenvolvimento
 
-### 3) Dominio proprio (opcional)
+Para contribuir ou modificar o site:
 
-1. No mesmo menu `Pages`, configure `Custom domain`.
-2. Crie os registros DNS no seu provedor (A/CNAME) apontando para o GitHub Pages.
-3. Ative `Enforce HTTPS` quando disponivel.
+1. Faça um fork do repositório
+2. Crie uma branch para suas modificações
+3. Faça commit das mudanças
+4. Abra um Pull Request
 
-## Checklist Pre-Deploy
+## Contato
 
-- Validar contatos no HTML
-- Confirmar caminho do video do hero
-- Testar navegacao mobile
-- Rodar revisao visual em desktop e mobile
-- Confirmar que nao ha arquivos temporarios desnecessarios no commit
+- Email: davidoval74@gmail.com
+- Telefone: +55 11 9999-9999
+- Localização: São Paulo, SP
 
-## Rollback Rapido
+## Licença
 
-Se precisar voltar a versao anterior:
-
-```bash
-git log --oneline
-git revert <hash_do_commit>
-git push origin main
-```
-
-## Contato Oficial
-
-- Email: contato@datahubconsuilting.com.br
-- WhatsApp: +55 11 92562-1121
-- Localizacao: Sao Paulo, SP
-
-## Licenca
-
-Projeto proprietario da DataHub. Todos os direitos reservados.
+Este projeto é propriedade da DataHub Consultoria. Todos os direitos reservados.

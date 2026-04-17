@@ -80,9 +80,21 @@ document.querySelectorAll('.service-card, .case-card, .stat-box').forEach(el => 
 // CTA hover estilo extra (simplificado)
 const ctaButton = document.querySelector('.cta .btn-white');
 if (ctaButton) {
-    ctaButton.addEventListener('mouseenter', () => {
+    const paintGlowFromPointer = (event) => {
+        const rect = ctaButton.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        ctaButton.style.setProperty('--mx', `${x}px`);
+        ctaButton.style.setProperty('--my', `${y}px`);
+    };
+
+    ctaButton.addEventListener('mouseenter', (event) => {
+        paintGlowFromPointer(event);
         ctaButton.classList.add('active-hover');
     });
+
+    ctaButton.addEventListener('mousemove', paintGlowFromPointer);
 
     ctaButton.addEventListener('mouseleave', () => {
         ctaButton.classList.remove('active-hover');
