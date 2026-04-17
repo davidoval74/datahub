@@ -2,6 +2,16 @@
 
 $config = require __DIR__ . '/config.php';
 
+if (!extension_loaded('mysqli')) {
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'ok' => false,
+        'message' => 'Extensao mysqli nao esta habilitada no servidor PHP.'
+    ]);
+    exit;
+}
+
 if (
     $config['db_name'] === 'cpanel_database_name' ||
     $config['db_user'] === 'cpanel_database_user' ||
@@ -16,7 +26,9 @@ if (
     exit;
 }
 
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+if (defined('MYSQLI_REPORT_ERROR') && defined('MYSQLI_REPORT_STRICT')) {
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+}
 
 try {
     $mysqli = new mysqli(
@@ -32,7 +44,8 @@ try {
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
         'ok' => false,
-        'message' => 'Falha na conexao com o banco de dados.'
+        'message' => 'Falha na conexao com o banco de dados.',
+        'errorCode' => $e->getCode()
     ]);
     exit;
 }
