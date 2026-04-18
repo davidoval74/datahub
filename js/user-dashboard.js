@@ -7,11 +7,22 @@ const menuToggleBtn = document.getElementById("menuToggleBtn");
 const toolButtons = Array.from(document.querySelectorAll(".tool-item"));
 const toolCards = Array.from(document.querySelectorAll(".tool-card"));
 const contentRoot = document.querySelector(".user-content");
+const loadCryptoPricesBtn = document.getElementById("loadCryptoPricesBtn");
+const cryptoPricesFeedback = document.getElementById("cryptoPricesFeedback");
+const cryptoPricesResult = document.getElementById("cryptoPricesResult");
 const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/index\.html)?\/?$/, "");
 const appOrigin = `${window.location.origin}${appBaseFromUser}`;
 const meEndpoint = `${appOrigin}/api/auth/me.php`;
 const logoutEndpoint = `${appOrigin}/api/auth/logout.php`;
+const cryptoPricesEndpoint = `${appOrigin}/api/crypto/prices.php`;
 const loginUrl = `${appOrigin}/login/`;
+
+const escapeHtml = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
 const setSidebarCollapsed = (collapsed) => {
     if (!shell) {
@@ -82,6 +93,94 @@ const renderAuthRequired = (message) => {
     contentRoot.prepend(wrapper);
 };
 
+const setCryptoFeedback = (message, type) => {
+    if (!cryptoPricesFeedback) {
+        return;
+    }
+
+    cryptoPricesFeedback.textContent = message;
+    cryptoPricesFeedback.className = "tool-feedback";
+    if (type) {
+        cryptoPricesFeedback.classList.add(type);
+    }
+};
+
+const renderCryptoRows = (rows) => {
+    if (!cryptoPricesResult) {
+        return;
+    }
+
+    if (!rows.length) {
+        cryptoPricesResult.hidden = false;
+        cryptoPricesResult.innerHTML = '<p class="crypto-empty">A consulta retornou 0 registros.</p>';
+        return;
+    }
+
+    const lines = rows.map((row) => {
+        const timestamp = escapeHtml(row.timestamp);
+        const price = escapeHtml(row.price);
+        return `<tr><td>${timestamp}</td><td>${price}</td></tr>`;
+    });
+
+    cryptoPricesResult.hidden = false;
+    cryptoPricesResult.innerHTML = `
+        <table class="crypto-prices-table">
+            <thead>
+                <tr>
+                    <th>timestamp</th>
+                    <th>price</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${lines.join("")}
+            </tbody>
+        </table>
+    `;
+};
+
+const loadCryptoPrices = async () => {
+    if (!loadCryptoPricesBtn) {
+        return;
+    }
+
+    loadCryptoPricesBtn.disabled = true;
+    setCryptoFeedback("Consultando banco de dados...", "");
+
+    try {
+        const response = await fetch(cryptoPricesEndpoint, {
+            method: "GET",
+            credentials: "same-origin"
+        });
+
+        const rawBody = await response.text();
+        let result = null;
+
+        try {
+            result = JSON.parse(rawBody);
+        } catch (_parseError) {
+            result = null;
+        }
+
+        if (!response.ok) {
+            const fallbackMessage = `Erro ${response.status} ao consultar crypto_prices.`;
+            setCryptoFeedback((result && result.message) || fallbackMessage, "error");
+            return;
+        }
+
+        if (!result || !Array.isArray(result.data)) {
+            setCryptoFeedback("Resposta inesperada da API para crypto_prices.", "error");
+            return;
+        }
+
+        renderCryptoRows(result.data);
+        setCryptoFeedback(`Consulta concluida: ${result.data.length} registros retornados.`, "success");
+    } catch (_error) {
+        setCryptoFeedback("Nao foi possivel conectar ao endpoint de crypto_prices.", "error");
+    } finally {
+        loadCryptoPricesBtn.disabled = false;
+    }
+};
+
 const loadSession = async () => {
     try {
         const response = await fetch(meEndpoint, {
@@ -145,6 +244,10 @@ if (menuToggleBtn) {
         const collapsed = !shell.classList.contains("menu-collapsed");
         setSidebarCollapsed(collapsed);
     });
+}
+
+if (loadCryptoPricesBtn) {
+    loadCryptoPricesBtn.addEventListener("click", loadCryptoPrices);
 }
 
 window.addEventListener("resize", hydrateSidebarState);

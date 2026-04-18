@@ -52,7 +52,12 @@
                 <article class="tool-card" data-panel="dashboard">
                     <h2>Dashboard Executivo</h2>
                     <p>Acompanhe os principais KPIs da operacao em tempo real.</p>
-                    <a href="#" class="tool-link">Abrir painel</a>
+                    <div class="tool-actions">
+                        <a href="#" class="tool-link">Abrir painel</a>
+                        <button type="button" id="loadCryptoPricesBtn" class="tool-action-btn">Consultar BITCOIN</button>
+                    </div>
+                    <p id="cryptoPricesFeedback" class="tool-feedback" aria-live="polite"></p>
+                    <div id="cryptoPricesResult" class="crypto-prices-result" hidden></div>
                 </article>
 
                 <article class="tool-card" data-panel="relatorios">
