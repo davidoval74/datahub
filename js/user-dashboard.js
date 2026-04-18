@@ -132,7 +132,9 @@ toolButtons.forEach((button) => {
     button.addEventListener("click", () => setActiveTool(button.dataset.tool));
 });
 
-logoutBtn.addEventListener("click", performLogout);
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", performLogout);
+}
 
 if (menuToggleBtn) {
     menuToggleBtn.addEventListener("click", () => {
