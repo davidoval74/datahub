@@ -14,22 +14,28 @@
 <body>
     <main class="user-shell">
         <aside class="user-sidebar">
-            <a href="../" class="brand-link" aria-label="Voltar para home">
-                <img src="../png/datahub-logo.png" alt="DataHub" onerror="this.style.display='none';">
-                <strong>DataHub</strong>
-            </a>
+            <div class="sidebar-head">
+                <a href="../" class="brand-link" aria-label="Voltar para home">
+                    <img src="../png/datahub-logo.png" alt="DataHub" onerror="this.style.display='none';">
+                    <strong>DataHub</strong>
+                </a>
+
+                <button id="menuToggleBtn" class="menu-toggle-btn" type="button" aria-label="Encolher menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
 
             <p class="sidebar-label">Menu de ferramentas</p>
             <nav class="tool-nav" aria-label="Ferramentas da area do usuario">
-                <button class="tool-item active" data-tool="dashboard"><i class="fa-solid fa-chart-line"></i>Dashboard</button>
-                <button class="tool-item" data-tool="relatorios"><i class="fa-regular fa-file-lines"></i>Relatorios</button>
-                <button class="tool-item" data-tool="documentos"><i class="fa-regular fa-folder-open"></i>Documentos</button>
-                <button class="tool-item" data-tool="tarefas"><i class="fa-solid fa-list-check"></i>Tarefas</button>
-                <button class="tool-item" data-tool="suporte"><i class="fa-regular fa-life-ring"></i>Suporte</button>
+                <button class="tool-item active" data-tool="dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></button>
+                <button class="tool-item" data-tool="relatorios"><i class="fa-regular fa-file-lines"></i><span>Relatorios</span></button>
+                <button class="tool-item" data-tool="documentos"><i class="fa-regular fa-folder-open"></i><span>Documentos</span></button>
+                <button class="tool-item" data-tool="tarefas"><i class="fa-solid fa-list-check"></i><span>Tarefas</span></button>
+                <button class="tool-item" data-tool="suporte"><i class="fa-regular fa-life-ring"></i><span>Suporte</span></button>
             </nav>
 
             <button id="logoutBtn" class="logout-btn" type="button">
-                <i class="fa-solid fa-right-from-bracket"></i>Sair
+                <i class="fa-solid fa-right-from-bracket"></i><span>Sair</span>
             </button>
         </aside>
 

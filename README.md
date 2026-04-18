@@ -89,8 +89,10 @@ c:\Datahub\
 
 1. A pagina `/usuario/` chama `/api/auth/me.php`.
 2. Se a sessao existir, os dados do usuario sao exibidos.
-3. Se a sessao falhar, a pagina mostra aviso de autenticacao.
-4. O logout chama `/api/auth/logout.php`.
+3. O menu lateral permite encolher/expandir no desktop e salva o estado no navegador.
+4. Ao selecionar uma ferramenta no menu, apenas o card correspondente fica visivel.
+5. Se a sessao falhar, a pagina mostra aviso de autenticacao.
+6. O logout chama `/api/auth/logout.php`.
 
 ## Banco de dados
 
@@ -135,6 +137,7 @@ Depois acesse `http://localhost:8000`.
 - `js/auth-login.js` esta com redirecionamento final hardcoded para `https://datahubconsulting.com.br/usuario/`.
 - Isso resolve o deploy atual em producao, mas nao e ideal para homologacao ou teste local.
 - `api/health.php` deve ser removido ou protegido apos a estabilizacao do ambiente.
+- o menu lateral encolhido da area do usuario e um estado local (localStorage), por navegador.
 
 ## Cache e deploy
 
@@ -169,6 +172,12 @@ Se a API retornar erro de configuracao:
 - confirme se login e dashboard estao no mesmo dominio
 - teste `/api/auth/me.php` imediatamente apos o login
 - confirme se cookies de sessao nao estao sendo bloqueados
+
+### Menu nao alterna ou nao filtra cards
+
+- confirme se a versao nova de `js/user-dashboard.js` foi publicada
+- valide se `css/user.css` foi atualizado no deploy
+- limpe cache do navegador e recarregue a pagina
 
 ## Melhorias recomendadas
 

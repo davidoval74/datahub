@@ -1,6 +1,9 @@
 const LOGIN_STORAGE_KEY = "datahub.auth";
+const SIDEBAR_COLLAPSED_KEY = "datahub.sidebarCollapsed";
+const shell = document.querySelector(".user-shell");
 const welcomeText = document.getElementById("welcomeText");
 const logoutBtn = document.getElementById("logoutBtn");
+const menuToggleBtn = document.getElementById("menuToggleBtn");
 const toolButtons = Array.from(document.querySelectorAll(".tool-item"));
 const toolCards = Array.from(document.querySelectorAll(".tool-card"));
 const contentRoot = document.querySelector(".user-content");
@@ -10,14 +13,46 @@ const meEndpoint = `${appOrigin}/api/auth/me.php`;
 const logoutEndpoint = `${appOrigin}/api/auth/logout.php`;
 const loginUrl = `${appOrigin}/login/`;
 
+const setSidebarCollapsed = (collapsed) => {
+    if (!shell) {
+        return;
+    }
+
+    shell.classList.toggle("menu-collapsed", collapsed);
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+};
+
+const hydrateSidebarState = () => {
+    if (!shell) {
+        return;
+    }
+
+    if (window.innerWidth <= 920) {
+        shell.classList.remove("menu-collapsed");
+        return;
+    }
+
+    const collapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1";
+    shell.classList.toggle("menu-collapsed", collapsed);
+};
+
 const setActiveTool = (tool) => {
     toolButtons.forEach((button) => {
         button.classList.toggle("active", button.dataset.tool === tool);
     });
 
+    const hasMatchingCard = toolCards.some((card) => card.dataset.panel === tool);
+
     toolCards.forEach((card) => {
         const shouldHighlight = card.dataset.panel === tool;
         card.classList.toggle("highlight", shouldHighlight);
+
+        if (hasMatchingCard) {
+            card.classList.toggle("is-hidden", !shouldHighlight);
+        } else {
+            card.classList.remove("is-hidden");
+        }
+
         if (shouldHighlight) {
             card.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
@@ -98,5 +133,20 @@ toolButtons.forEach((button) => {
 });
 
 logoutBtn.addEventListener("click", performLogout);
+
+if (menuToggleBtn) {
+    menuToggleBtn.addEventListener("click", () => {
+        if (window.innerWidth <= 920) {
+            return;
+        }
+
+        const collapsed = !shell.classList.contains("menu-collapsed");
+        setSidebarCollapsed(collapsed);
+    });
+}
+
+window.addEventListener("resize", hydrateSidebarState);
+
+hydrateSidebarState();
 setActiveTool("dashboard");
 loadSession();
