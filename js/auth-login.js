@@ -10,6 +10,7 @@ const appBaseFromLogin = window.location.pathname.replace(/\/login(?:\/index\.ht
 const appOrigin = `${window.location.origin}${appBaseFromLogin}`;
 const loginEndpoint = `${appOrigin}/api/auth/login.php`;
 const dashboardUrl = "https://datahubconsulting.com.br/usuario/";
+let recaptchaToken = "";
 
 const setFeedback = (message, type) => {
     feedback.textContent = message;
@@ -42,8 +43,20 @@ const hydrateRememberedEmail = () => {
     }
 };
 
+window.onLoginRecaptchaSuccess = (token) => {
+    recaptchaToken = String(token || "").trim();
+};
+
+window.onLoginRecaptchaExpired = () => {
+    recaptchaToken = "";
+};
+
 const getRecaptchaToken = () => {
-    const responseField = form?.querySelector('[name="g-recaptcha-response"]');
+    if (recaptchaToken) {
+        return recaptchaToken;
+    }
+
+    const responseField = document.querySelector('[name="g-recaptcha-response"]');
     const fieldValue = responseField?.value?.trim();
 
     if (fieldValue) {
@@ -108,6 +121,7 @@ const submitLogin = async (event) => {
             if (window.grecaptcha) {
                 grecaptcha.reset();
             }
+            recaptchaToken = "";
             return;
         }
 
@@ -133,6 +147,7 @@ const submitLogin = async (event) => {
         if (window.grecaptcha) {
             grecaptcha.reset();
         }
+        recaptchaToken = "";
     }
 };
 
