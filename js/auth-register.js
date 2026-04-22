@@ -5,6 +5,7 @@ const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 const feedback = document.getElementById("feedback");
 const registerEndpoint = new URL("../api/auth/register.php", window.location.href).href;
+let recaptchaToken = "";
 
 const setFeedback = (message, type) => {
     feedback.textContent = message;
@@ -16,8 +17,20 @@ const setFeedback = (message, type) => {
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 
+window.onRegisterRecaptchaSuccess = (token) => {
+    recaptchaToken = String(token || "").trim();
+};
+
+window.onRegisterRecaptchaExpired = () => {
+    recaptchaToken = "";
+};
+
 const getRecaptchaToken = () => {
-    const responseField = registerForm?.querySelector('[name="g-recaptcha-response"]');
+    if (recaptchaToken) {
+        return recaptchaToken;
+    }
+
+    const responseField = document.querySelector('[name="g-recaptcha-response"]');
     const fieldValue = responseField?.value?.trim();
 
     if (fieldValue) {
@@ -95,6 +108,7 @@ const submitRegister = async (event) => {
             if (window.grecaptcha) {
                 grecaptcha.reset();
             }
+            recaptchaToken = "";
             return;
         }
 
@@ -112,6 +126,7 @@ const submitRegister = async (event) => {
         if (window.grecaptcha) {
             grecaptcha.reset();
         }
+        recaptchaToken = "";
     }
 };
 
