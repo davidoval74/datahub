@@ -35,38 +35,100 @@ function is_valid_email($email) {
 }
 
 function validate_recaptcha($token) {
-    $secret_key = '***RECAPTCHA_SECRET_REMOVED***';
-    
-    if (empty($token)) {
-        return false;
+    $secretKey = '***RECAPTCHA_SECRET_REMOVED***';
+
+    if ($token === '') {
+        return [
+            'ok' => false,
+            'message' => 'Token do reCAPTCHA nao recebido.',
+            'errorCodes' => ['missing-input-response']
+        ];
     }
-    
+
+    $payload = [
+        'secret' => $secretKey,
+        'response' => $token,
+        'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+    ];
+
     try {
-        $response = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => 'Content-type: application/x-www-form-urlencoded',
-                'content' => http_build_query([
-                    'secret' => $secret_key,
-                    'response' => $token
-                ]),
-                'timeout' => 5
-            ]
-        ]));
-        
-        if ($response === false) {
-            return false;
+        $response = null;
+        $transportError = null;
+
+        if (function_exists('curl_init')) {
+            $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => http_build_query($payload),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_CONNECTTIMEOUT => 10,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+            ]);
+
+            $response = curl_exec($ch);
+            if ($response === false) {
+                $transportError = curl_error($ch);
+            }
+            curl_close($ch);
         }
-        
+
+        if ($response === null) {
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                    'content' => http_build_query($payload),
+                    'timeout' => 10
+                ]
+            ]);
+
+            $response = @file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
+            if ($response === false) {
+                $transportError = 'Falha ao conectar no endpoint do Google reCAPTCHA.';
+            }
+        }
+
+        if ($response === false || $response === null) {
+            return [
+                'ok' => false,
+                'message' => 'Nao foi possivel validar o reCAPTCHA com o Google.',
+                'errorCodes' => $transportError ? [$transportError] : []
+            ];
+        }
+
         $result = json_decode($response, true);
-        
-        // reCAPTCHA v2 retorna apenas success (true/false)
-        if (isset($result['success']) && $result['success'] === true) {
-            return true;
+        if (!is_array($result)) {
+            return [
+                'ok' => false,
+                'message' => 'Resposta invalida do Google reCAPTCHA.',
+                'errorCodes' => []
+            ];
         }
-        
-        return false;
+
+        if (!empty($result['success'])) {
+            return [
+                'ok' => true,
+                'message' => 'reCAPTCHA validado com sucesso.',
+                'errorCodes' => []
+            ];
+        }
+
+        $errorCodes = [];
+        if (!empty($result['error-codes']) && is_array($result['error-codes'])) {
+            $errorCodes = $result['error-codes'];
+        }
+
+        return [
+            'ok' => false,
+            'message' => 'Google rejeitou o token do reCAPTCHA.',
+            'errorCodes' => $errorCodes
+        ];
     } catch (Throwable $e) {
-        return false;
+        return [
+            'ok' => false,
+            'message' => 'Erro interno ao validar o reCAPTCHA.',
+            'errorCodes' => [$e->getMessage()]
+        ];
     }
 }
