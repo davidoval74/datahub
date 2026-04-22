@@ -44,6 +44,13 @@ const submitRegister = async (event) => {
         return;
     }
 
+    // Obter token reCAPTCHA v2 (injetado automaticamente pelo Google)
+    const recaptchaToken = grecaptcha.getResponse();
+    if (!recaptchaToken) {
+        setFeedback("Por favor, confirme que voce nao eh um robo.", "error");
+        return;
+    }
+
     try {
         const response = await fetch(registerEndpoint, {
             method: "POST",
@@ -51,7 +58,12 @@ const submitRegister = async (event) => {
                 "Content-Type": "application/json"
             },
             credentials: "same-origin",
-            body: JSON.stringify({ name, email, password })
+            body: JSON.stringify({ 
+                name, 
+                email, 
+                password,
+                recaptcha_token: recaptchaToken
+            })
         });
 
         const rawBody = await response.text();
@@ -66,6 +78,9 @@ const submitRegister = async (event) => {
         if (!response.ok) {
             const fallbackMessage = `Erro ${response.status} no cadastro.`;
             setFeedback((result && result.message) || fallbackMessage, "error");
+            if (window.grecaptcha) {
+                grecaptcha.reset();
+            }
             return;
         }
 
@@ -80,6 +95,9 @@ const submitRegister = async (event) => {
         }, 900);
     } catch (_error) {
         setFeedback(`Nao foi possivel conectar a API (${registerEndpoint}).`, "error");
+        if (window.grecaptcha) {
+            grecaptcha.reset();
+        }
     }
 };
 

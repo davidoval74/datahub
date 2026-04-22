@@ -179,6 +179,44 @@ body {
     font-size: 0.9rem;
 }
 
+.recaptcha-info {
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    color: #7a8fa1;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.recaptcha-info i {
+    color: #06a8dc;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.recaptcha-info a {
+    color: #0b6198;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.recaptcha-info a:hover {
+    color: #06a8dc;
+}
+
+.recaptcha-wrapper {
+    margin: 0.8rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.recaptcha-wrapper .g-recaptcha {
+    transform: scale(0.95);
+    transform-origin: center;
+}
+
 .auth-aside {
     border-radius: 24px;
     background: linear-gradient(145deg, #0c2342 0%, #153d69 45%, #0f5d81 100%);
