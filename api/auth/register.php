@@ -9,6 +9,7 @@ $input = read_json_body();
 $name = trim((string)($input['name'] ?? ''));
 $email = strtolower(trim((string)($input['email'] ?? '')));
 $password = (string)($input['password'] ?? '');
+$recaptcha_token = (string)($input['recaptcha_token'] ?? '');
 
 if (strlen($name) < 3) {
     send_json(400, ['ok' => false, 'message' => 'Nome deve ter pelo menos 3 caracteres.']);
@@ -20,6 +21,11 @@ if (!is_valid_email($email)) {
 
 if (strlen($password) < 8) {
     send_json(400, ['ok' => false, 'message' => 'Senha deve ter no minimo 8 caracteres.']);
+}
+
+// Validar reCAPTCHA
+if (!validate_recaptcha($recaptcha_token)) {
+    send_json(429, ['ok' => false, 'message' => 'Validacao reCAPTCHA falhou. Tente novamente.']);
 }
 
 try {

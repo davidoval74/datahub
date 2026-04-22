@@ -58,6 +58,13 @@ const submitLogin = async (event) => {
         return;
     }
 
+    // Obter token reCAPTCHA v2 (injetado automaticamente pelo Google)
+    const recaptchaToken = grecaptcha.getResponse();
+    if (!recaptchaToken) {
+        setFeedback("Por favor, confirme que voce nao eh um robo.", "error");
+        return;
+    }
+
     try {
         const response = await fetch(loginEndpoint, {
             method: "POST",
@@ -65,7 +72,11 @@ const submitLogin = async (event) => {
                 "Content-Type": "application/json"
             },
             credentials: "same-origin",
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ 
+                email, 
+                password,
+                recaptcha_token: recaptchaToken
+            })
         });
 
         const rawBody = await response.text();
@@ -80,6 +91,9 @@ const submitLogin = async (event) => {
         if (!response.ok) {
             const fallbackMessage = `Erro ${response.status} ao autenticar.`;
             setFeedback((result && result.message) || fallbackMessage, "error");
+            if (window.grecaptcha) {
+                grecaptcha.reset();
+            }
             return;
         }
 
@@ -102,6 +116,9 @@ const submitLogin = async (event) => {
         }, 350);
     } catch (_error) {
         setFeedback(`Nao foi possivel conectar a API (${loginEndpoint}).`, "error");
+        if (window.grecaptcha) {
+            grecaptcha.reset();
+        }
     }
 };
 

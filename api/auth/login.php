@@ -8,9 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = read_json_body();
 $email = strtolower(trim((string)($input['email'] ?? '')));
 $password = (string)($input['password'] ?? '');
+$recaptcha_token = (string)($input['recaptcha_token'] ?? '');
 
 if (!is_valid_email($email) || $password === '') {
     send_json(400, ['ok' => false, 'message' => 'Credenciais invalidas.']);
+}
+
+// Validar reCAPTCHA
+if (!validate_recaptcha($recaptcha_token)) {
+    send_json(429, ['ok' => false, 'message' => 'Validacao reCAPTCHA falhou. Tente novamente.']);
 }
 
 try {

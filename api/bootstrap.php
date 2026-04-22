@@ -33,3 +33,40 @@ function send_json($statusCode, $payload) {
 function is_valid_email($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
+
+function validate_recaptcha($token) {
+    $secret_key = '***RECAPTCHA_SECRET_REMOVED***';
+    
+    if (empty($token)) {
+        return false;
+    }
+    
+    try {
+        $response = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-type: application/x-www-form-urlencoded',
+                'content' => http_build_query([
+                    'secret' => $secret_key,
+                    'response' => $token
+                ]),
+                'timeout' => 5
+            ]
+        ]));
+        
+        if ($response === false) {
+            return false;
+        }
+        
+        $result = json_decode($response, true);
+        
+        // reCAPTCHA v2 retorna apenas success (true/false)
+        if (isset($result['success']) && $result['success'] === true) {
+            return true;
+        }
+        
+        return false;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
