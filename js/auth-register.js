@@ -16,6 +16,21 @@ const setFeedback = (message, type) => {
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 
+const getRecaptchaToken = () => {
+    const responseField = registerForm?.querySelector('[name="g-recaptcha-response"]');
+    const fieldValue = responseField?.value?.trim();
+
+    if (fieldValue) {
+        return fieldValue;
+    }
+
+    if (window.grecaptcha && typeof window.grecaptcha.getResponse === "function") {
+        return window.grecaptcha.getResponse();
+    }
+
+    return "";
+};
+
 const submitRegister = async (event) => {
     event.preventDefault();
 
@@ -44,8 +59,7 @@ const submitRegister = async (event) => {
         return;
     }
 
-    // Obter token reCAPTCHA v2 (injetado automaticamente pelo Google)
-    const recaptchaToken = grecaptcha.getResponse();
+    const recaptchaToken = getRecaptchaToken();
     if (!recaptchaToken) {
         setFeedback("Por favor, confirme que voce nao eh um robo.", "error");
         return;

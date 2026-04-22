@@ -207,14 +207,15 @@ body {
 }
 
 .recaptcha-wrapper {
-    margin: 0.8rem 0;
-    display: flex;
-    justify-content: center;
+    width: 100%;
+    margin: 0.9rem 0 0.4rem;
+    display: grid;
+    place-items: center;
 }
 
 .recaptcha-wrapper .g-recaptcha {
-    transform: scale(0.95);
-    transform-origin: center;
+    display: inline-block;
+    margin: 0 auto;
 }
 
 .auth-aside {
@@ -438,5 +439,12 @@ body.login-page .card-footer {
 
     body.login-page .cloud-visual {
         min-height: 120px;
+    }
+}
+
+@media (max-width: 420px) {
+    .recaptcha-wrapper .g-recaptcha {
+        transform: scale(0.92);
+        transform-origin: center center;
     }
 }
