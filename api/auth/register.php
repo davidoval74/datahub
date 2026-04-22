@@ -24,8 +24,14 @@ if (strlen($password) < 8) {
 }
 
 // Validar reCAPTCHA
-if (!validate_recaptcha($recaptcha_token)) {
-    send_json(429, ['ok' => false, 'message' => 'Validacao reCAPTCHA falhou. Tente novamente.']);
+$recaptchaValidation = validate_recaptcha($recaptcha_token);
+if (!$recaptchaValidation['ok']) {
+    $message = $recaptchaValidation['message'];
+    if (!empty($recaptchaValidation['errorCodes'])) {
+        $message .= ' [' . implode(', ', $recaptchaValidation['errorCodes']) . ']';
+    }
+
+    send_json(429, ['ok' => false, 'message' => $message]);
 }
 
 try {
