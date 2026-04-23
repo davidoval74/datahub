@@ -40,15 +40,78 @@ function run_python_script($pythonBinary, $scriptPath, $workingDirectory) {
     return trim(implode("\n", $output));
 }
 
+function load_crypto_prices_from_csv_with_php($mysqli, $csvPath) {
+    if (!is_file($csvPath)) {
+        throw new RuntimeException('CSV de bitcoin nao encontrado para carga no banco.');
+    }
+
+    $mysqli->query(
+        "CREATE TABLE IF NOT EXISTS crypto_prices (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            timestamp DATETIME NOT NULL,
+            price DECIMAL(18, 8) NOT NULL,
+            PRIMARY KEY (id),
+            KEY idx_crypto_prices_timestamp (timestamp)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+
+    $mysqli->query('TRUNCATE TABLE crypto_prices');
+
+    $stmt = $mysqli->prepare('INSERT INTO crypto_prices (timestamp, price) VALUES (?, ?)');
+    if (!$stmt) {
+        throw new RuntimeException('Falha ao preparar insert de crypto_prices.');
+    }
+
+    $handle = fopen($csvPath, 'r');
+    if ($handle === false) {
+        $stmt->close();
+        throw new RuntimeException('Falha ao abrir CSV de bitcoin para leitura.');
+    }
+
+    $inserted = 0;
+    $header = fgetcsv($handle);
+    while (($row = fgetcsv($handle)) !== false) {
+        if (count($row) < 2) {
+            continue;
+        }
+
+        $timestamp = trim((string)$row[0]);
+        $price = (float)$row[1];
+
+        if ($timestamp === '') {
+            continue;
+        }
+
+        $stmt->bind_param('sd', $timestamp, $price);
+        $stmt->execute();
+        $inserted++;
+    }
+
+    fclose($handle);
+    $stmt->close();
+
+    return 'Carga via PHP concluida com ' . $inserted . ' registros.';
+}
+
 try {
     $defaultPythonBinary = PHP_OS_FAMILY === 'Windows' ? 'python' : 'python3';
     $pythonBinary = $config['python_bin'] ?? $defaultPythonBinary;
     $pythonDirectory = realpath(__DIR__ . '/../python');
     $extractScript = $pythonDirectory . DIRECTORY_SEPARATOR . 'Extract.py';
     $loadScript = $pythonDirectory . DIRECTORY_SEPARATOR . 'Load.py';
+    $csvPath = realpath(__DIR__ . '/../../bitcoin_prices.csv') ?: (__DIR__ . '/../../bitcoin_prices.csv');
 
     $extractOutput = run_python_script($pythonBinary, $extractScript, $pythonDirectory);
-    $loadOutput = run_python_script($pythonBinary, $loadScript, $pythonDirectory);
+    try {
+        $loadOutput = run_python_script($pythonBinary, $loadScript, $pythonDirectory);
+    } catch (RuntimeException $loadException) {
+        $loadErrorText = $loadException->getMessage();
+        if (strpos($loadErrorText, "No module named 'mysql'") !== false || strpos($loadErrorText, 'No module named mysql') !== false) {
+            $loadOutput = load_crypto_prices_from_csv_with_php($mysqli, $csvPath);
+        } else {
+            throw $loadException;
+        }
+    }
 
     $query = 'SELECT * FROM crypto_prices';
     $result = $mysqli->query($query);
