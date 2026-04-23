@@ -105,6 +105,41 @@ const setCryptoFeedback = (message, type) => {
     }
 };
 
+const formatCryptoTimestamp = (value) => {
+    if (!value) {
+        return "-";
+    }
+
+    const normalized = String(value).replace(" ", "T");
+    const date = new Date(normalized);
+    if (Number.isNaN(date.getTime())) {
+        return String(value);
+    }
+
+    return new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    }).format(date);
+};
+
+const formatCryptoPrice = (value) => {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+        return String(value ?? "-");
+    }
+
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(numeric);
+};
+
 const renderCryptoRows = (rows) => {
     if (!cryptoPricesResult) {
         return;
@@ -117,9 +152,9 @@ const renderCryptoRows = (rows) => {
     }
 
     const lines = rows.map((row) => {
-        const timestamp = escapeHtml(row.timestamp);
-        const price = escapeHtml(row.price);
-        return `<tr><td>${timestamp}</td><td>${price}</td></tr>`;
+        const timestamp = escapeHtml(formatCryptoTimestamp(row.timestamp));
+        const price = escapeHtml(formatCryptoPrice(row.price));
+        return `<tr><td class="timestamp-cell">${timestamp}</td><td class="price-cell">${price}</td></tr>`;
     });
 
     cryptoPricesResult.hidden = false;
@@ -127,8 +162,8 @@ const renderCryptoRows = (rows) => {
         <table class="crypto-prices-table">
             <thead>
                 <tr>
-                    <th>timestamp</th>
-                    <th>price</th>
+                    <th scope="col">timestamp</th>
+                    <th scope="col" class="price-col">price</th>
                 </tr>
             </thead>
             <tbody>
