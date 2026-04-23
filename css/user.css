@@ -280,24 +280,25 @@ body {
 }
 
 .crypto-prices-result {
-    margin-top: 0.55rem;
+    margin-top: 0.65rem;
     border: 1px solid var(--line);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: auto;
-    max-height: 260px;
+    max-height: 320px;
     background: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .crypto-prices-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
 }
 
 .crypto-prices-table th,
 .crypto-prices-table td {
     text-align: left;
-    padding: 0.42rem 0.5rem;
+    padding: 0.62rem 0.72rem;
     border-bottom: 1px solid #e7f0f8;
     white-space: nowrap;
 }
@@ -305,8 +306,36 @@ body {
 .crypto-prices-table th {
     position: sticky;
     top: 0;
-    background: #f2f9ff;
+    background: linear-gradient(180deg, #eef8ff 0%, #f8fcff 100%);
     color: #0f5f89;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    z-index: 1;
+}
+
+.crypto-prices-table tbody tr:nth-child(even) {
+    background: #fbfdff;
+}
+
+.crypto-prices-table tbody tr:hover {
+    background: #eef8ff;
+}
+
+.crypto-prices-table .price-col,
+.crypto-prices-table .price-cell {
+    text-align: right;
+}
+
+.crypto-prices-table .price-cell {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: #0c587f;
+}
+
+.crypto-prices-table .timestamp-cell {
+    color: #1a3857;
+    font-variant-numeric: tabular-nums;
 }
 
 .crypto-empty {
