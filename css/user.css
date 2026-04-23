@@ -184,38 +184,13 @@ body {
 }
 
 .status-pill {
-    border: 1px solid rgba(37, 211, 102, 0.45);
-    background: linear-gradient(135deg, rgba(37, 211, 102, 0.2), rgba(18, 140, 126, 0.16));
+    border: 1px solid rgba(12, 139, 197, 0.25);
+    background: rgba(12, 139, 197, 0.1);
     border-radius: 999px;
     padding: 0.35rem 0.7rem;
     font-size: 0.82rem;
     font-weight: 700;
-    color: #0f6b4b;
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    animation: status-online-pulse 1.7s ease-out infinite;
-}
-
-@keyframes status-online-pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        border-color: rgba(37, 211, 102, 0.45);
-    }
-
-    70% {
-        box-shadow: 0 0 0 10px rgba(37, 211, 102, 0), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        border-color: rgba(37, 211, 102, 0.72);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        border-color: rgba(37, 211, 102, 0.45);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .status-pill {
-        animation: none;
-    }
+    color: #0f5f89;
 }
 
 .tools-grid {
@@ -309,7 +284,7 @@ body {
     border: 1px solid var(--line);
     border-radius: 12px;
     overflow: auto;
-    max-height: 40vh;
+    max-height: 320px;
     background: #ffffff;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
@@ -367,54 +342,6 @@ body {
     padding: 0.7rem;
     color: var(--ink-soft);
     font-size: 0.85rem;
-}
-
-.dashboard-split-view {
-    margin-top: 0.55rem;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 0.75rem;
-    align-items: start;
-}
-
-.dashboard-table-panel,
-.dashboard-chart-panel {
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: linear-gradient(180deg, #ffffff 0%, #f9fdff 100%);
-    padding: 0.6rem;
-}
-
-.panel-title {
-    font-size: 0.82rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    color: #0f5f89;
-    margin-bottom: 0.45rem;
-    text-transform: uppercase;
-}
-
-.dashboard-table-panel .crypto-prices-result {
-    margin-top: 0;
-    max-height: 45vh;
-}
-
-.chart-placeholder {
-    min-height: 45vh;
-    border: 1px dashed rgba(12, 139, 197, 0.35);
-    border-radius: 10px;
-    background: linear-gradient(150deg, rgba(12, 139, 197, 0.06), rgba(0, 188, 147, 0.06));
-    display: grid;
-    place-content: center;
-    gap: 0.25rem;
-    text-align: center;
-    color: #4a6786;
-    padding: 0.9rem;
-}
-
-.chart-placeholder p {
-    margin: 0;
-    font-size: 0.9rem;
 }
 
 .tool-card.highlight {
@@ -484,16 +411,6 @@ body {
 
     .logout-btn {
         margin-top: 0.2rem;
-    }
-
-    .dashboard-split-view {
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-table-panel .crypto-prices-result,
-    .chart-placeholder {
-        min-height: 0;
-        max-height: 320px;
     }
 }
 
