@@ -144,7 +144,7 @@ const loadCryptoPrices = async () => {
     }
 
     loadCryptoPricesBtn.disabled = true;
-    setCryptoFeedback("Consultando banco de dados...", "");
+    setCryptoFeedback("Atualizando base com Extract + Load e consultando banco...", "");
 
     try {
         const response = await fetch(cryptoPricesEndpoint, {
@@ -173,9 +173,9 @@ const loadCryptoPrices = async () => {
         }
 
         renderCryptoRows(result.data);
-        setCryptoFeedback(`Consulta concluida: ${result.data.length} registros retornados.`, "success");
+        setCryptoFeedback(`Atualizacao concluida: ${result.data.length} registros retornados.`, "success");
     } catch (_error) {
-        setCryptoFeedback("Nao foi possivel conectar ao endpoint de crypto_prices.", "error");
+        setCryptoFeedback("Nao foi possivel executar o fluxo Extract + Load para crypto_prices.", "error");
     } finally {
         loadCryptoPricesBtn.disabled = false;
     }
