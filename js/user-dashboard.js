@@ -140,30 +140,6 @@ const formatCryptoPrice = (value) => {
     }).format(numeric);
 };
 
-const adjustCryptoTableViewport = (rowsCount) => {
-    if (!cryptoPricesResult) {
-        return;
-    }
-
-    const headerEl = cryptoPricesResult.querySelector("thead");
-    const firstRowEl = cryptoPricesResult.querySelector("tbody tr");
-
-    if (!headerEl || !firstRowEl) {
-        cryptoPricesResult.style.maxHeight = "none";
-        cryptoPricesResult.style.overflowY = "hidden";
-        return;
-    }
-
-    const headerHeight = headerEl.getBoundingClientRect().height;
-    const rowHeight = firstRowEl.getBoundingClientRect().height;
-    const maxVisibleRows = 8;
-    const visibleRows = Math.min(rowsCount, maxVisibleRows);
-    const contentHeight = Math.ceil(headerHeight + (rowHeight * visibleRows) + 2);
-
-    cryptoPricesResult.style.maxHeight = `${contentHeight}px`;
-    cryptoPricesResult.style.overflowY = rowsCount > maxVisibleRows ? "auto" : "hidden";
-};
-
 const renderCryptoRows = (rows) => {
     if (!cryptoPricesResult) {
         return;
@@ -175,18 +151,7 @@ const renderCryptoRows = (rows) => {
         return;
     }
 
-    const sortedRows = [...rows].sort((a, b) => {
-        const priceA = Number(a.price);
-        const priceB = Number(b.price);
-
-        if (Number.isNaN(priceA) || Number.isNaN(priceB)) {
-            return 0;
-        }
-
-        return priceB - priceA;
-    });
-
-    const lines = sortedRows.map((row) => {
+    const lines = rows.map((row) => {
         const timestamp = escapeHtml(formatCryptoTimestamp(row.timestamp));
         const price = escapeHtml(formatCryptoPrice(row.price));
         return `<tr><td class="timestamp-cell">${timestamp}</td><td class="price-cell">${price}</td></tr>`;
@@ -206,8 +171,6 @@ const renderCryptoRows = (rows) => {
             </tbody>
         </table>
     `;
-
-    adjustCryptoTableViewport(sortedRows.length);
 };
 
 const loadCryptoPrices = async () => {
