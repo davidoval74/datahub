@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/user.css?v=20260422-7">
+    <link rel="stylesheet" href="../css/user.css?v=20260422-10">
 </head>
 <body>
     <main class="user-shell">
@@ -57,7 +57,21 @@
                         <button type="button" id="loadCryptoPricesBtn" class="tool-action-btn">Consultar BITCOIN</button>
                     </div>
                     <p id="cryptoPricesFeedback" class="tool-feedback" aria-live="polite"></p>
-                    <div id="cryptoPricesResult" class="crypto-prices-result" hidden></div>
+
+                    <div class="dashboard-split-view">
+                        <section class="dashboard-table-panel">
+                            <h3 class="panel-title">Tabela BTC</h3>
+                            <div id="cryptoPricesResult" class="crypto-prices-result" hidden></div>
+                        </section>
+
+                        <section class="dashboard-chart-panel" aria-label="Area reservada para grafico">
+                            <h3 class="panel-title">Grafico BTC</h3>
+                            <div class="chart-placeholder">
+                                <p>Area reservada para o grafico.</p>
+                                <p>Use este bloco para integrar seu chart.</p>
+                            </div>
+                        </section>
+                    </div>
                 </article>
 
                 <article class="tool-card" data-panel="relatorios">
