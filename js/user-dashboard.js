@@ -163,7 +163,8 @@ const loadCryptoPrices = async () => {
 
         if (!response.ok) {
             const fallbackMessage = `Erro ${response.status} ao consultar crypto_prices.`;
-            setCryptoFeedback((result && result.message) || fallbackMessage, "error");
+            const details = result && result.details ? ` Detalhes: ${result.details}` : "";
+            setCryptoFeedback(((result && result.message) || fallbackMessage) + details, "error");
             return;
         }
 
