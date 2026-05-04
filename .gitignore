@@ -107,3 +107,9 @@ Thumbs.db
 # Secrets
 api/config.php
 api/python/config.py
+
+# Python cache
+api/python/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
