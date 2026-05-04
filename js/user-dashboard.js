@@ -10,6 +10,7 @@ const contentRoot = document.querySelector(".user-content");
 const loadCryptoPricesBtn = document.getElementById("loadCryptoPricesBtn");
 const cryptoPricesFeedback = document.getElementById("cryptoPricesFeedback");
 const cryptoPricesResult = document.getElementById("cryptoPricesResult");
+let btcChart = null;
 const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/index\.html)?\/?$/, "");
 const appOrigin = `${window.location.origin}${appBaseFromUser}`;
 const meEndpoint = `${appOrigin}/api/auth/me.php`;
@@ -176,14 +177,9 @@ const renderCryptoRows = (rows) => {
     }
 
     const sortedRows = [...rows].sort((a, b) => {
-        const priceA = Number(a.price);
-        const priceB = Number(b.price);
-
-        if (Number.isNaN(priceA) || Number.isNaN(priceB)) {
-            return 0;
-        }
-
-        return priceB - priceA;
+        const tsA = new Date(String(a.timestamp).replace(" ", "T")).getTime();
+        const tsB = new Date(String(b.timestamp).replace(" ", "T")).getTime();
+        return tsB - tsA; // mais recente primeiro
     });
 
     const lines = sortedRows.map((row) => {
@@ -197,8 +193,8 @@ const renderCryptoRows = (rows) => {
         <table class="crypto-prices-table">
             <thead>
                 <tr>
-                    <th scope="col">timestamp</th>
-                    <th scope="col" class="price-col">price</th>
+                    <th scope="col">Data / Hora</th>
+                    <th scope="col" class="price-col">Preço (USD)</th>
                 </tr>
             </thead>
             <tbody>
@@ -208,6 +204,133 @@ const renderCryptoRows = (rows) => {
     `;
 
     adjustCryptoTableViewport(sortedRows.length);
+};
+
+const renderBtcKpis = (rows) => {
+    const kpiRow = document.getElementById("btcKpiRow");
+    if (!kpiRow || !rows.length) return;
+
+    const byTime = [...rows].sort((a, b) =>
+        new Date(String(a.timestamp).replace(" ", "T")) - new Date(String(b.timestamp).replace(" ", "T"))
+    );
+    const prices = byTime.map((r) => Number(r.price));
+    const last  = prices[prices.length - 1];
+    const first = prices[0];
+    const max   = Math.max(...prices);
+    const min   = Math.min(...prices);
+    const changePct = ((last - first) / first) * 100;
+
+    document.getElementById("btcCurrentPrice").textContent = formatCryptoPrice(last);
+    document.getElementById("btcHighPrice").textContent    = formatCryptoPrice(max);
+    document.getElementById("btcLowPrice").textContent     = formatCryptoPrice(min);
+
+    const changeEl = document.getElementById("btcPriceChange");
+    changeEl.textContent = `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`;
+    changeEl.className = `btc-kpi-value ${changePct >= 0 ? "btc-kpi-positive" : "btc-kpi-negative"}`;
+
+    kpiRow.hidden = false;
+};
+
+const renderBtcChart = (rows) => {
+    const wrapper = document.getElementById("btcChartWrapper");
+    const canvas  = document.getElementById("btcPriceChart");
+    if (!wrapper || !canvas || !rows.length) return;
+
+    if (typeof Chart === "undefined") {
+        wrapper.hidden = false;
+        wrapper.innerHTML = '<p class="btc-chart-unavailable">Gráfico indisponível — Chart.js não carregou.</p>';
+        return;
+    }
+
+    const byTime = [...rows].sort((a, b) =>
+        new Date(String(a.timestamp).replace(" ", "T")) - new Date(String(b.timestamp).replace(" ", "T"))
+    );
+
+    const labels = byTime.map((r) => {
+        const d = new Date(String(r.timestamp).replace(" ", "T"));
+        return new Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit", month: "2-digit",
+            hour: "2-digit", minute: "2-digit"
+        }).format(d);
+    });
+    const data   = byTime.map((r) => Number(r.price));
+    const maxVal = Math.max(...data);
+    const minVal = Math.min(...data);
+
+    if (btcChart) { btcChart.destroy(); btcChart = null; }
+
+    btcChart = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: "BTC/USD",
+                    data,
+                    borderColor: "#0c8bc5",
+                    backgroundColor: "rgba(12,139,197,0.07)",
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: "Máxima",
+                    data: data.map(() => maxVal),
+                    borderColor: "rgba(11,122,95,0.55)",
+                    borderWidth: 1,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0
+                },
+                {
+                    label: "Mínima",
+                    data: data.map(() => minVal),
+                    borderColor: "rgba(195,90,0,0.55)",
+                    borderWidth: 1,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "top",
+                    labels: { boxWidth: 12, font: { size: 11 }, color: "#1a3857" }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.dataset.label}: ${formatCryptoPrice(ctx.parsed.y)}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { maxTicksLimit: 8, maxRotation: 0, font: { size: 11 }, color: "#4a6786" },
+                    grid:  { color: "rgba(213,229,243,0.5)" }
+                },
+                y: {
+                    ticks: {
+                        callback: (v) => `$${(v / 1000).toFixed(0)}k`,
+                        font: { size: 11 },
+                        color: "#4a6786"
+                    },
+                    grid: { color: "rgba(213,229,243,0.5)" }
+                }
+            }
+        }
+    });
+
+    wrapper.hidden = false;
 };
 
 const loadCryptoPrices = async () => {
@@ -246,7 +369,9 @@ const loadCryptoPrices = async () => {
         }
 
         renderCryptoRows(result.data);
-        setCryptoFeedback(`Atualizacao concluida: ${result.data.length} registros retornados.`, "success");
+        renderBtcKpis(result.data);
+        renderBtcChart(result.data);
+        setCryptoFeedback(`Atualização concluída: ${result.data.length} registros retornados.`, "success");
     } catch (_error) {
         setCryptoFeedback("Nao foi possivel executar o fluxo Extract + Load para crypto_prices.", "error");
     } finally {

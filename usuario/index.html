@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/user.css?v=20260422-9">
+    <link rel="stylesheet" href="../css/user.css?v=20260504-1">
 </head>
 <body>
     <main class="user-shell">
@@ -45,18 +45,46 @@
                     <h1>Area do Usuario</h1>
                     <p id="welcomeText">Carregando seus dados...</p>
                 </div>
-                <span class="status-pill">Sessao ativa</span>
+                <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>Sessão ativa</span>
             </header>
 
             <section class="tools-grid">
                 <article class="tool-card" data-panel="dashboard">
-                    <h2>Dashboard Executivo</h2>
-                    <p>Acompanhe os principais KPIs da operacao em tempo real.</p>
-                    <div class="tool-actions">
-                        <a href="#" class="tool-link">Abrir painel</a>
-                        <button type="button" id="loadCryptoPricesBtn" class="tool-action-btn">Consultar BITCOIN</button>
+                    <div class="btc-dash-header">
+                        <div>
+                            <h2><i class="fa-brands fa-bitcoin btc-icon"></i> Bitcoin Dashboard</h2>
+                            <p>Preços BTC/USD via pipeline ETL — dados mais recentes primeiro.</p>
+                        </div>
+                        <button type="button" id="loadCryptoPricesBtn" class="tool-action-btn">
+                            <i class="fa-solid fa-rotate"></i> Atualizar
+                        </button>
                     </div>
+
                     <p id="cryptoPricesFeedback" class="tool-feedback" aria-live="polite"></p>
+
+                    <div id="btcKpiRow" class="btc-kpi-row" hidden>
+                        <div class="btc-kpi">
+                            <span class="btc-kpi-label">Último preço</span>
+                            <span class="btc-kpi-value" id="btcCurrentPrice">—</span>
+                        </div>
+                        <div class="btc-kpi">
+                            <span class="btc-kpi-label">Máxima</span>
+                            <span class="btc-kpi-value btc-kpi-high" id="btcHighPrice">—</span>
+                        </div>
+                        <div class="btc-kpi">
+                            <span class="btc-kpi-label">Mínima</span>
+                            <span class="btc-kpi-value btc-kpi-low" id="btcLowPrice">—</span>
+                        </div>
+                        <div class="btc-kpi">
+                            <span class="btc-kpi-label">Variação total</span>
+                            <span class="btc-kpi-value" id="btcPriceChange">—</span>
+                        </div>
+                    </div>
+
+                    <div id="btcChartWrapper" class="btc-chart-wrapper" hidden>
+                        <canvas id="btcPriceChart" aria-label="Gráfico de evolução do preço do Bitcoin"></canvas>
+                    </div>
+
                     <div id="cryptoPricesResult" class="crypto-prices-result" hidden></div>
                 </article>
 
@@ -87,6 +115,7 @@
         </section>
     </main>
 
-    <script src="../js/user-dashboard.js?v=20260422-3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <script src="../js/user-dashboard.js?v=20260504-2"></script>
 </body>
 </html>
