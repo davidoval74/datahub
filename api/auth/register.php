@@ -60,6 +60,7 @@ try {
         'name' => $name,
         'email' => $email
     ];
+    session_regenerate_id(true);
 
     send_json(201, [
         'ok' => true,

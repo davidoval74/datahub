@@ -106,3 +106,4 @@ Thumbs.db
 
 # Secrets
 api/config.php
+api/python/config.py
