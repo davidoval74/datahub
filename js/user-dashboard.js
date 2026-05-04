@@ -390,12 +390,14 @@ const loadCryptoPrices = async () => {
         if (!response.ok) {
             const fallbackMessage = `Erro ${response.status} ao consultar crypto_prices.`;
             const details = result && result.details ? ` Detalhes: ${result.details}` : "";
+            if (loadingToast) loadingToast.querySelector(".toast__close").click();
             setCryptoFeedback(((result && result.message) || fallbackMessage) + details, "error");
             showToast(((result && result.message) || fallbackMessage) + details, "error", 7000);
             return;
         }
 
         if (!result || !Array.isArray(result.data)) {
+            if (loadingToast) loadingToast.querySelector(".toast__close").click();
             setCryptoFeedback("Resposta inesperada da API para crypto_prices.", "error");
             showToast("Resposta inesperada da API para crypto_prices.", "error", 7000);
             return;
