@@ -18,6 +18,7 @@
 
 body {
     min-height: 100vh;
+    min-height: 100dvh;
     font-family: "Inter", sans-serif;
     color: var(--ink);
     background:
@@ -65,12 +66,32 @@ body {
 }
 
 .badge {
-    background: rgba(6, 168, 220, 0.12);
-    color: var(--ink-soft);
-    border: 1px solid rgba(6, 168, 220, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    border: 1px solid rgba(6, 168, 220, 0.38);
+    background: rgba(6, 168, 220, 0.09);
     border-radius: 999px;
-    padding: 0.3rem 0.68rem;
-    font-size: 0.8rem;
+    padding: 0.35rem 0.75rem 0.35rem 0.55rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0b6ea8;
+    white-space: nowrap;
+}
+
+.badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #06a8dc;
+    flex-shrink: 0;
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(6, 168, 220, 0.5); }
+    50%       { opacity: 0.75; box-shadow: 0 0 0 5px rgba(6, 168, 220, 0); }
 }
 
 .auth-card h1 {
@@ -105,8 +126,7 @@ body {
 }
 
 .field:focus-within {
-    border-color: var(--cyan);
-    box-shadow: 0 0 0 4px rgba(6, 168, 220, 0.16);
+    box-shadow: 0 0 0 3px rgba(11, 27, 51, 0.08);
 }
 
 .field i {
@@ -256,19 +276,21 @@ body.login-page {
 }
 
 body.login-page .auth-layout {
-    max-width: 1180px;
+    width: min(1180px, calc(100vw - clamp(1rem, 6vw, 4rem)));
     margin: 0 auto;
     align-items: center;
-    padding: 1rem;
-    gap: 1.15rem;
+    grid-template-columns: minmax(0, clamp(310px, 44vw, 520px)) minmax(0, 1fr);
+    padding: clamp(0.8rem, 1.8vh, 1.35rem) clamp(0.8rem, 2.4vw, 1.9rem);
+    gap: clamp(0.85rem, 1.8vw, 1.15rem);
 }
 
 body.login-page .auth-card,
 body.login-page .auth-aside {
-    padding: 1.25rem 1.3rem;
+    border-radius: clamp(18px, 2.3vw, 24px);
+    padding: clamp(1rem, 1.9vw, 1.25rem) clamp(1rem, 2vw, 1.3rem);
     position: relative;
     overflow: hidden;
-    transition: transform 220ms ease, box-shadow 240ms ease, border-color 240ms ease;
+    transition: transform 180ms ease, box-shadow 220ms ease;
 }
 
 body.login-page .auth-card::before,
@@ -284,17 +306,15 @@ body.login-page .auth-aside::before {
 
 body.login-page .auth-card:hover,
 body.login-page .auth-aside:hover {
-    transform: translateY(-3px);
+    transform: translateY(-1px);
 }
 
 body.login-page .auth-card:hover {
-    border-color: rgba(12, 143, 191, 0.35);
-    box-shadow: 0 18px 34px rgba(7, 30, 56, 0.17);
+    box-shadow: 0 14px 28px rgba(7, 30, 56, 0.15);
 }
 
 body.login-page .auth-aside:hover {
-    border-color: rgba(158, 228, 255, 0.42);
-    box-shadow: 0 20px 38px rgba(4, 14, 34, 0.34);
+    box-shadow: 0 16px 30px rgba(4, 14, 34, 0.3);
 }
 
 body.login-page .auth-card:hover::before,
@@ -303,6 +323,7 @@ body.login-page .auth-aside:hover::before {
 }
 
 body.login-page .brand-link strong,
+body.login-page .badge,
 body.login-page .auth-card h1,
 body.login-page .auth-aside h2 {
     font-family: "Space Grotesk", sans-serif;
@@ -419,7 +440,7 @@ body.login-page .card-footer {
 @media (max-width: 980px) {
     .auth-layout {
         grid-template-columns: 1fr;
-        padding: 1rem;
+        padding: clamp(0.75rem, 3vw, 1rem);
     }
 
     .auth-aside {
@@ -428,13 +449,14 @@ body.login-page .card-footer {
     }
 
     body.login-page .auth-layout {
-        padding: 0.75rem;
-        gap: 0.9rem;
+        width: min(100%, calc(100vw - clamp(0.6rem, 4vw, 1.2rem)));
+        padding: clamp(0.65rem, 2.6vw, 0.95rem);
+        gap: clamp(0.75rem, 2.8vw, 0.95rem);
     }
 
     body.login-page .auth-aside {
         min-height: auto;
-        padding: 1rem;
+        padding: clamp(0.9rem, 2.8vw, 1rem);
     }
 
     body.login-page .cloud-visual {
