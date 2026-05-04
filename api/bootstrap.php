@@ -8,6 +8,9 @@ if (!empty($config['session_name'])) {
 }
 
 if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', '1');
+    ini_set('session.cookie_samesite', 'Strict');
+    ini_set('session.cookie_secure', '1');
     session_start();
 }
 
@@ -35,7 +38,12 @@ function is_valid_email($email) {
 }
 
 function validate_recaptcha($token) {
-    $secretKey = '***RECAPTCHA_SECRET_REMOVED***';
+    global $config;
+    $secretKey = $config['recaptcha_secret'] ?? '';
+
+    if ($secretKey === '') {
+        return ['ok' => false, 'message' => 'Configuracao do reCAPTCHA ausente.', 'errorCodes' => []];
+    }
 
     if ($token === '') {
         return [
