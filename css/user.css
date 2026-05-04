@@ -422,6 +422,98 @@ body {
     border-color: rgba(178, 47, 47, 0.18);
 }
 
+/* ── Toast notifications ───────────────────────────────── */
+.toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: all;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    min-width: 260px;
+    max-width: 380px;
+    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    font-family: "Manrope", sans-serif;
+    font-size: 0.87rem;
+    font-weight: 600;
+    line-height: 1.4;
+    box-shadow: 0 8px 28px rgba(10, 30, 55, 0.18);
+    animation: toast-in 280ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.toast--out {
+    animation: toast-out 240ms ease-in both;
+}
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(60px) scale(0.92); }
+    to   { opacity: 1; transform: translateX(0)   scale(1); }
+}
+
+@keyframes toast-out {
+    from { opacity: 1; transform: translateX(0)   scale(1); }
+    to   { opacity: 0; transform: translateX(60px) scale(0.92); }
+}
+
+.toast__icon { flex-shrink: 0; margin-top: 0.1rem; font-size: 1rem; }
+.toast__msg  { flex: 1; }
+
+.toast__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 0 0 0.25rem;
+    opacity: 0.55;
+    transition: opacity 150ms;
+    flex-shrink: 0;
+}
+.toast__close:hover { opacity: 1; }
+
+.toast--success {
+    background: #f0fdf7;
+    border-color: rgba(11, 122, 95, 0.3);
+    color: #065c42;
+}
+.toast--success .toast__icon  { color: #0b7a5f; }
+.toast--success .toast__close { color: #065c42; }
+
+.toast--error {
+    background: #fff4f4;
+    border-color: rgba(178, 47, 47, 0.3);
+    color: #7a1818;
+}
+.toast--error .toast__icon  { color: #b22f2f; }
+.toast--error .toast__close { color: #7a1818; }
+
+.toast--info {
+    background: #f0f8ff;
+    border-color: rgba(12, 139, 197, 0.3);
+    color: #0c4a6e;
+}
+.toast--info .toast__icon  { color: #0c8bc5; }
+.toast--info .toast__close { color: #0c4a6e; }
+
+.toast--loading {
+    background: #f8faff;
+    border-color: rgba(12, 139, 197, 0.25);
+    color: #1a3857;
+}
+.toast--loading .toast__icon  { color: #0c8bc5; }
+.toast--loading .toast__close { color: #1a3857; }
+
 .crypto-prices-result {
     margin-top: 0.45rem;
     border: 1px solid rgba(155, 184, 210, 0.55);

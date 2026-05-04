@@ -106,6 +106,37 @@ const setCryptoFeedback = (message, type) => {
     }
 };
 
+const showToast = (message, type = "info", durationMs = 4500) => {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const icons = { success: "fa-circle-check", error: "fa-circle-xmark", info: "fa-circle-info", loading: "fa-rotate" };
+    const icon = icons[type] ?? icons.info;
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast--${type}`;
+    toast.setAttribute("role", "status");
+    toast.innerHTML = `
+        <i class="fa-solid ${icon} toast__icon${type === "loading" ? " fa-spin" : ""}"></i>
+        <span class="toast__msg">${escapeHtml(message)}</span>
+        <button class="toast__close" aria-label="Fechar">&times;</button>
+    `;
+
+    const dismiss = () => {
+        toast.classList.add("toast--out");
+        toast.addEventListener("animationend", () => toast.remove(), { once: true });
+    };
+
+    toast.querySelector(".toast__close").addEventListener("click", dismiss);
+    container.appendChild(toast);
+
+    if (type !== "loading") {
+        setTimeout(dismiss, durationMs);
+    }
+
+    return toast;
+};
+
 const formatCryptoTimestamp = (value) => {
     if (!value) {
         return "-";
@@ -339,7 +370,7 @@ const loadCryptoPrices = async () => {
     }
 
     loadCryptoPricesBtn.disabled = true;
-    setCryptoFeedback("Atualizando base com Extract + Load e consultando banco...", "");
+    const loadingToast = showToast("Executando pipeline ETL — Extract + Load...", "loading", 0);
 
     try {
         const response = await fetch(cryptoPricesEndpoint, {
@@ -360,20 +391,26 @@ const loadCryptoPrices = async () => {
             const fallbackMessage = `Erro ${response.status} ao consultar crypto_prices.`;
             const details = result && result.details ? ` Detalhes: ${result.details}` : "";
             setCryptoFeedback(((result && result.message) || fallbackMessage) + details, "error");
+            showToast(((result && result.message) || fallbackMessage) + details, "error", 7000);
             return;
         }
 
         if (!result || !Array.isArray(result.data)) {
             setCryptoFeedback("Resposta inesperada da API para crypto_prices.", "error");
+            showToast("Resposta inesperada da API para crypto_prices.", "error", 7000);
             return;
         }
 
         renderCryptoRows(result.data);
         renderBtcKpis(result.data);
         renderBtcChart(result.data);
+        if (loadingToast) loadingToast.querySelector(".toast__close").click();
         setCryptoFeedback(`Atualização concluída: ${result.data.length} registros retornados.`, "success");
+        showToast(`${result.data.length} registros carregados com sucesso.`, "success");
     } catch (_error) {
-        setCryptoFeedback("Nao foi possivel executar o fluxo Extract + Load para crypto_prices.", "error");
+        if (loadingToast) loadingToast.querySelector(".toast__close").click();
+        setCryptoFeedback("Não foi possível executar o fluxo Extract + Load para crypto_prices.", "error");
+        showToast("Falha na conexão com a API. Tente novamente.", "error", 7000);
     } finally {
         loadCryptoPricesBtn.disabled = false;
     }
