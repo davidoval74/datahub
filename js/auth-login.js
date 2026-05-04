@@ -22,17 +22,6 @@ const setFeedback = (message, type) => {
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 
-const saveSession = (user) => {
-    const payload = {
-        isAuthenticated: true,
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        loginAt: new Date().toISOString()
-    };
-    localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(payload));
-};
-
 const hydrateRememberedEmail = () => {
     const remembered = localStorage.getItem(REMEMBER_EMAIL_KEY);
     if (remembered && emailInput) {
@@ -129,8 +118,6 @@ const submitLogin = async (event) => {
             setFeedback("A API respondeu em formato inesperado.", "error");
             return;
         }
-
-        saveSession(result.user);
 
         if (rememberMeInput && rememberMeInput.checked) {
             localStorage.setItem(REMEMBER_EMAIL_KEY, email);

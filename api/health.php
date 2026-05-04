@@ -3,7 +3,6 @@ header('Content-Type: application/json; charset=utf-8');
 
 $result = [
     'ok' => true,
-    'phpVersion' => PHP_VERSION,
     'checks' => []
 ];
 
@@ -44,7 +43,6 @@ try {
         $result['ok'] = false;
         $result['checks']['databaseConnection'] = false;
         $result['checks']['usersTable'] = false;
-        $result['dbError'] = $mysqli->connect_error;
         http_response_code(500);
         echo json_encode($result);
         exit;
@@ -68,7 +66,6 @@ try {
     $result['ok'] = false;
     $result['checks']['databaseConnection'] = false;
     $result['checks']['usersTable'] = false;
-    $result['exception'] = $e->getMessage();
     http_response_code(500);
     echo json_encode($result);
     exit;

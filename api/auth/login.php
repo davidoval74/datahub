@@ -46,6 +46,7 @@ try {
         'name' => $userName,
         'email' => $userEmail
     ];
+    session_regenerate_id(true);
 
     send_json(200, [
         'ok' => true,
