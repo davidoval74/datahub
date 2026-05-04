@@ -8,8 +8,8 @@ Foi adicionada proteção **reCAPTCHA v3** nos endpoints de **login** e **regist
 
 ## 🔑 Chaves Configuradas
 
-- **Site Key**: `6LcVzcQsAAAAAD75hSBJ783M8JwxcdR_eoQRu9oa`
-- **Secret Key**: `6LcVzcQsAAAAALbPTRrF5fbLJRsOGUtFSJ3zGILs`
+- **Site Key**: `YOUR_RECAPTCHA_SITE_KEY`
+- **Secret Key**: `YOUR_RECAPTCHA_SECRET_KEY`
 
 ---
 
