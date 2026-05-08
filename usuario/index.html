@@ -50,40 +50,17 @@
 
             <section class="tools-grid">
                 <article class="tool-card" data-panel="dashboard">
-                    <div class="btc-dash-header">
-                        <div>
-                            <h2><i class="fa-brands fa-bitcoin btc-icon"></i> Bitcoin Dashboard</h2>
-                            <p>Preços BTC/USD via pipeline ETL — dados mais recentes primeiro.</p>
-                        </div>
-                        <button type="button" id="loadCryptoPricesBtn" class="tool-action-btn">
-                            <i class="fa-solid fa-rotate"></i> Atualizar
-                        </button>
+                    <!-- Sub-abas internas -->
+                    <div class="dash-subtab-bar">
+                        <button class="dash-subtab active" data-subtab="ouro"><i class="fa-solid fa-trophy" style="color:#FFD700;"></i> Dashboard Ouro</button>
+                        <button class="dash-subtab" data-subtab="bitcoin"><i class="fa-brands fa-bitcoin btc-icon"></i> Dashboard Bitcoin</button>
                     </div>
 
-                    <div id="btcKpiRow" class="btc-kpi-row" hidden>
-                        <div class="btc-kpi">
-                            <span class="btc-kpi-label">Último preço</span>
-                            <span class="btc-kpi-value" id="btcCurrentPrice">—</span>
-                        </div>
-                        <div class="btc-kpi">
-                            <span class="btc-kpi-label">Máxima</span>
-                            <span class="btc-kpi-value btc-kpi-high" id="btcHighPrice">—</span>
-                        </div>
-                        <div class="btc-kpi">
-                            <span class="btc-kpi-label">Mínima</span>
-                            <span class="btc-kpi-value btc-kpi-low" id="btcLowPrice">—</span>
-                        </div>
-                        <div class="btc-kpi">
-                            <span class="btc-kpi-label">Variação total</span>
-                            <span class="btc-kpi-value" id="btcPriceChange">—</span>
-                        </div>
-                    </div>
+                    <!-- Painel Ouro — conteúdo carregado de dashboard-ouro.html -->
+                    <div class="dash-subpanel" id="subpanel-ouro"></div>
 
-                    <div id="btcChartWrapper" class="btc-chart-wrapper" hidden>
-                        <canvas id="btcPriceChart" aria-label="Gráfico de evolução do preço do Bitcoin"></canvas>
-                    </div>
-
-                    <div id="cryptoPricesResult" class="crypto-prices-result" hidden></div>
+                    <!-- Painel Bitcoin — conteúdo carregado de dashboard-bitcoin.html -->
+                    <div class="dash-subpanel" id="subpanel-bitcoin" hidden></div>
                 </article>
 
                 <article class="tool-card" data-panel="relatorios">
@@ -116,5 +93,47 @@
     <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="false"></div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
     <script src="../js/user-dashboard.js?v=20260504-2"></script>
+    <script>
+        const dashPartials = {
+            ouro:    { file: 'dashboard-ouro.html',    loaded: false },
+            bitcoin: { file: 'dashboard-bitcoin.html', loaded: false }
+        };
+
+        async function loadSubpanel(subtab) {
+            const partial = dashPartials[subtab];
+            if (!partial || partial.loaded) return;
+
+            const panel = document.getElementById('subpanel-' + subtab);
+            try {
+                const res = await fetch(partial.file);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                panel.innerHTML = await res.text();
+                partial.loaded = true;
+                // Re-bind o botão Atualizar do painel recém-carregado
+                if (typeof bindDashboardButtons === 'function') bindDashboardButtons();
+            } catch (e) {
+                panel.innerHTML = '<p class="error-banner">Erro ao carregar o painel.</p>';
+            }
+        }
+
+        async function activateSubtab(subtab) {
+            document.querySelectorAll('.dash-subtab').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.dash-subpanel').forEach(function(p) { p.hidden = true; });
+
+            const btn = document.querySelector('.dash-subtab[data-subtab="' + subtab + '"]');
+            const panel = document.getElementById('subpanel-' + subtab);
+            if (btn) btn.classList.add('active');
+            if (panel) panel.hidden = false;
+
+            await loadSubpanel(subtab);
+        }
+
+        document.querySelectorAll('.dash-subtab').forEach(function(btn) {
+            btn.addEventListener('click', function() { activateSubtab(btn.dataset.subtab); });
+        });
+
+        // Carrega a aba inicial (ouro) ao abrir o dashboard
+        loadSubpanel('ouro');
+    </script>
 </body>
 </html>

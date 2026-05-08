@@ -1,0 +1,19 @@
+<div class="btc-dash-header">
+    <div>
+        <h2><i class="fa-solid fa-trophy" style="color:#FFD700;"></i> Dashboard Ouro</h2>
+        <p>Preços BTC/USD via pipeline ETL — dados mais recentes primeiro.</p>
+    </div>
+    <button type="button" id="loadCryptoPricesBtn" class="tool-action-btn">
+        <i class="fa-solid fa-rotate"></i> Atualizar
+    </button>
+</div>
+<div id="btcKpiRow" class="btc-kpi-row" hidden>
+    <div class="btc-kpi"><span class="btc-kpi-label">Último preço</span><span class="btc-kpi-value" id="btcCurrentPrice">—</span></div>
+    <div class="btc-kpi"><span class="btc-kpi-label">Máxima</span><span class="btc-kpi-value btc-kpi-high" id="btcHighPrice">—</span></div>
+    <div class="btc-kpi"><span class="btc-kpi-label">Mínima</span><span class="btc-kpi-value btc-kpi-low" id="btcLowPrice">—</span></div>
+    <div class="btc-kpi"><span class="btc-kpi-label">Variação total</span><span class="btc-kpi-value" id="btcPriceChange">—</span></div>
+</div>
+<div id="btcChartWrapper" class="btc-chart-wrapper" hidden>
+    <canvas id="btcPriceChart" aria-label="Gráfico de evolução do preço do Bitcoin"></canvas>
+</div>
+<div id="cryptoPricesResult" class="crypto-prices-result" hidden></div>
