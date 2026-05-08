@@ -95,14 +95,15 @@ const renderAuthRequired = (message) => {
 };
 
 const setCryptoFeedback = (message, type) => {
-    if (!cryptoPricesFeedback) {
+    const el = document.getElementById("cryptoPricesFeedback");
+    if (!el) {
         return;
     }
 
-    cryptoPricesFeedback.textContent = message;
-    cryptoPricesFeedback.className = "tool-feedback";
+    el.textContent = message;
+    el.className = "tool-feedback";
     if (type) {
-        cryptoPricesFeedback.classList.add(type);
+        el.classList.add(type);
     }
 };
 
@@ -173,16 +174,17 @@ const formatCryptoPrice = (value) => {
 };
 
 const adjustCryptoTableViewport = (rowsCount) => {
-    if (!cryptoPricesResult) {
+    const el = document.getElementById("cryptoPricesResult") ?? document.getElementById("cryptoPricesResultBtc");
+    if (!el) {
         return;
     }
 
-    const headerEl = cryptoPricesResult.querySelector("thead");
-    const firstRowEl = cryptoPricesResult.querySelector("tbody tr");
+    const headerEl = el.querySelector("thead");
+    const firstRowEl = el.querySelector("tbody tr");
 
     if (!headerEl || !firstRowEl) {
-        cryptoPricesResult.style.maxHeight = "none";
-        cryptoPricesResult.style.overflowY = "hidden";
+        el.style.maxHeight = "none";
+        el.style.overflowY = "hidden";
         return;
     }
 
@@ -192,18 +194,19 @@ const adjustCryptoTableViewport = (rowsCount) => {
     const visibleRows = Math.min(rowsCount, maxVisibleRows);
     const contentHeight = Math.ceil(headerHeight + (rowHeight * visibleRows) + 2);
 
-    cryptoPricesResult.style.maxHeight = `${contentHeight}px`;
-    cryptoPricesResult.style.overflowY = rowsCount > maxVisibleRows ? "auto" : "hidden";
+    el.style.maxHeight = `${contentHeight}px`;
+    el.style.overflowY = rowsCount > maxVisibleRows ? "auto" : "hidden";
 };
 
 const renderCryptoRows = (rows) => {
-    if (!cryptoPricesResult) {
+    const el = document.getElementById("cryptoPricesResult") ?? document.getElementById("cryptoPricesResultBtc");
+    if (!el) {
         return;
     }
 
     if (!rows.length) {
-        cryptoPricesResult.hidden = false;
-        cryptoPricesResult.innerHTML = '<p class="crypto-empty">A consulta retornou 0 registros.</p>';
+        el.hidden = false;
+        el.innerHTML = '<p class="crypto-empty">A consulta retornou 0 registros.</p>';
         return;
     }
 
@@ -219,8 +222,8 @@ const renderCryptoRows = (rows) => {
         return `<tr><td class="timestamp-cell">${timestamp}</td><td class="price-cell">${price}</td></tr>`;
     });
 
-    cryptoPricesResult.hidden = false;
-    cryptoPricesResult.innerHTML = `
+    el.hidden = false;
+    el.innerHTML = `
         <table class="crypto-prices-table">
             <thead>
                 <tr>
@@ -238,7 +241,8 @@ const renderCryptoRows = (rows) => {
 };
 
 const renderBtcKpis = (rows) => {
-    const kpiRow = document.getElementById("btcKpiRow");
+    const sfx = document.getElementById("btcKpiRow") ? "" : "Btc";
+    const kpiRow = document.getElementById("btcKpiRow" + sfx);
     if (!kpiRow || !rows.length) return;
 
     const byTime = [...rows].sort((a, b) =>
@@ -251,11 +255,11 @@ const renderBtcKpis = (rows) => {
     const min   = Math.min(...prices);
     const changePct = ((last - first) / first) * 100;
 
-    document.getElementById("btcCurrentPrice").textContent = formatCryptoPrice(last);
-    document.getElementById("btcHighPrice").textContent    = formatCryptoPrice(max);
-    document.getElementById("btcLowPrice").textContent     = formatCryptoPrice(min);
+    document.getElementById("btcCurrentPrice" + sfx).textContent = formatCryptoPrice(last);
+    document.getElementById("btcHighPrice" + sfx).textContent    = formatCryptoPrice(max);
+    document.getElementById("btcLowPrice" + sfx).textContent     = formatCryptoPrice(min);
 
-    const changeEl = document.getElementById("btcPriceChange");
+    const changeEl = document.getElementById("btcPriceChange" + sfx);
     changeEl.textContent = `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`;
     changeEl.className = `btc-kpi-value ${changePct >= 0 ? "btc-kpi-positive" : "btc-kpi-negative"}`;
 
@@ -263,8 +267,9 @@ const renderBtcKpis = (rows) => {
 };
 
 const renderBtcChart = (rows) => {
-    const wrapper = document.getElementById("btcChartWrapper");
-    const canvas  = document.getElementById("btcPriceChart");
+    const sfx = document.getElementById("btcChartWrapper") ? "" : "Btc";
+    const wrapper = document.getElementById("btcChartWrapper" + sfx);
+    const canvas  = document.getElementById("btcPriceChart" + sfx);
     if (!wrapper || !canvas || !rows.length) return;
 
     if (typeof Chart === "undefined") {
@@ -365,11 +370,12 @@ const renderBtcChart = (rows) => {
 };
 
 const loadCryptoPrices = async () => {
-    if (!loadCryptoPricesBtn) {
+    const btn = document.getElementById("loadCryptoPricesBtn") ?? document.getElementById("loadCryptoPricesBtnBtc");
+    if (!btn) {
         return;
     }
 
-    loadCryptoPricesBtn.disabled = true;
+    btn.disabled = true;
     const loadingToast = showToast("Executando pipeline ETL — Extract + Load...", "loading", 0);
 
     try {
@@ -414,8 +420,15 @@ const loadCryptoPrices = async () => {
         setCryptoFeedback("Não foi possível executar o fluxo Extract + Load para crypto_prices.", "error");
         showToast("Falha na conexão com a API. Tente novamente.", "error", 7000);
     } finally {
-        loadCryptoPricesBtn.disabled = false;
+        btn.disabled = false;
     }
+};
+
+window.bindDashboardButtons = () => {
+    const ouroBtn = document.getElementById("loadCryptoPricesBtn");
+    const btcBtn  = document.getElementById("loadCryptoPricesBtnBtc");
+    if (ouroBtn) ouroBtn.addEventListener("click", loadCryptoPrices);
+    if (btcBtn)  btcBtn.addEventListener("click", loadCryptoPrices);
 };
 
 const loadSession = async () => {
