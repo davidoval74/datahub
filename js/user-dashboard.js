@@ -14,6 +14,7 @@ const appOrigin = `${window.location.origin}${appBaseFromUser}`;
 const meEndpoint = `${appOrigin}/api/auth/me.php`;
 const logoutEndpoint = `${appOrigin}/api/auth/logout.php`;
 const cryptoPricesEndpoint = `${appOrigin}/api/crypto/prices.php`;
+const goldPricesEndpoint = `${appOrigin}/api/gold/prices.php`;
 const loginUrl = `${appOrigin}/login/`;
 
 const escapeHtml = (value) => String(value ?? "")
@@ -398,6 +399,8 @@ const renderBtcChart = (rows, suffix = "Btc") => {
 
 const loadCryptoPrices = async (buttonOrEvent) => {
     const suffix = getDashboardSuffix(buttonOrEvent);
+    const endpoint = suffix === "" ? goldPricesEndpoint : cryptoPricesEndpoint;
+    const datasetName = suffix === "" ? "gold_prices" : "crypto_prices";
     const btn = getScopedElement("loadCryptoPricesBtn", suffix);
     if (!btn) {
         return;
@@ -407,7 +410,7 @@ const loadCryptoPrices = async (buttonOrEvent) => {
     const loadingToast = showToast("Executando pipeline ETL — Extract + Load...", "loading", 0);
 
     try {
-        const response = await fetch(cryptoPricesEndpoint, {
+        const response = await fetch(endpoint, {
             method: "GET",
             credentials: "same-origin"
         });
@@ -422,7 +425,7 @@ const loadCryptoPrices = async (buttonOrEvent) => {
         }
 
         if (!response.ok) {
-            const fallbackMessage = `Erro ${response.status} ao consultar crypto_prices.`;
+            const fallbackMessage = `Erro ${response.status} ao consultar ${datasetName}.`;
             const details = result && result.details ? ` Detalhes: ${result.details}` : "";
             if (loadingToast) loadingToast.querySelector(".toast__close").click();
             setCryptoFeedback(((result && result.message) || fallbackMessage) + details, "error", suffix);
@@ -432,8 +435,8 @@ const loadCryptoPrices = async (buttonOrEvent) => {
 
         if (!result || !Array.isArray(result.data)) {
             if (loadingToast) loadingToast.querySelector(".toast__close").click();
-            setCryptoFeedback("Resposta inesperada da API para crypto_prices.", "error", suffix);
-            showToast("Resposta inesperada da API para crypto_prices.", "error", 7000);
+            setCryptoFeedback(`Resposta inesperada da API para ${datasetName}.`, "error", suffix);
+            showToast(`Resposta inesperada da API para ${datasetName}.`, "error", 7000);
             return;
         }
 
