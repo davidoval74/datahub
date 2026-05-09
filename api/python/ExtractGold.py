@@ -6,8 +6,8 @@ import requests
 BASE_DIR = Path(__file__).resolve().parents[2]
 CSV_PATH = BASE_DIR / "gold_prices.csv"
 
-# Mantemos o mesmo provedor e payload do Bitcoin por enquanto, conforme solicitado.
-url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart"
+# Fonte de ouro via CoinGecko (PAX Gold / PAXG).
+url = "https://api.coingecko.com/api/v3/coins/pax-gold/market_chart"
 
 params = {
     "vs_currency": "usd",
