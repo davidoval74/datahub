@@ -8,9 +8,7 @@ const toolButtons = Array.from(document.querySelectorAll(".tool-item"));
 const toolCards = Array.from(document.querySelectorAll(".tool-card"));
 const contentRoot = document.querySelector(".user-content");
 const loadCryptoPricesBtn = document.getElementById("loadCryptoPricesBtn");
-const cryptoPricesFeedback = document.getElementById("cryptoPricesFeedback");
-const cryptoPricesResult = document.getElementById("cryptoPricesResult");
-let btcChart = null;
+const btcCharts = new Map();
 const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/index\.html)?\/?$/, "");
 const appOrigin = `${window.location.origin}${appBaseFromUser}`;
 const meEndpoint = `${appOrigin}/api/auth/me.php`;
@@ -94,8 +92,26 @@ const renderAuthRequired = (message) => {
     contentRoot.prepend(wrapper);
 };
 
-const setCryptoFeedback = (message, type) => {
-    const el = document.getElementById("cryptoPricesFeedback");
+const getDashboardSuffix = (buttonOrSuffix) => {
+    if (buttonOrSuffix === "Btc" || buttonOrSuffix === "") {
+        return buttonOrSuffix;
+    }
+
+    const candidateId = buttonOrSuffix?.currentTarget?.id ?? buttonOrSuffix?.target?.id ?? buttonOrSuffix?.id;
+    return candidateId === "loadCryptoPricesBtn" ? "" : "Btc";
+};
+
+const getScopedElement = (baseId, suffix) => {
+    const scoped = document.getElementById(baseId + suffix);
+    if (scoped) {
+        return scoped;
+    }
+
+    return document.getElementById(baseId);
+};
+
+const setCryptoFeedback = (message, type, suffix = "Btc") => {
+    const el = getScopedElement("cryptoPricesFeedback", suffix);
     if (!el) {
         return;
     }
@@ -173,8 +189,8 @@ const formatCryptoPrice = (value) => {
     }).format(numeric);
 };
 
-const adjustCryptoTableViewport = (rowsCount) => {
-    const el = document.getElementById("cryptoPricesResult") ?? document.getElementById("cryptoPricesResultBtc");
+const adjustCryptoTableViewport = (rowsCount, suffix = "Btc") => {
+    const el = getScopedElement("cryptoPricesResult", suffix);
     if (!el) {
         return;
     }
@@ -198,8 +214,8 @@ const adjustCryptoTableViewport = (rowsCount) => {
     el.style.overflowY = rowsCount > maxVisibleRows ? "auto" : "hidden";
 };
 
-const renderCryptoRows = (rows) => {
-    const el = document.getElementById("cryptoPricesResult") ?? document.getElementById("cryptoPricesResultBtc");
+const renderCryptoRows = (rows, suffix = "Btc") => {
+    const el = getScopedElement("cryptoPricesResult", suffix);
     if (!el) {
         return;
     }
@@ -237,12 +253,11 @@ const renderCryptoRows = (rows) => {
         </table>
     `;
 
-    adjustCryptoTableViewport(sortedRows.length);
+    adjustCryptoTableViewport(sortedRows.length, suffix);
 };
 
-const renderBtcKpis = (rows) => {
-    const sfx = document.getElementById("btcKpiRow") ? "" : "Btc";
-    const kpiRow = document.getElementById("btcKpiRow" + sfx);
+const renderBtcKpis = (rows, suffix = "Btc") => {
+    const kpiRow = getScopedElement("btcKpiRow", suffix);
     if (!kpiRow || !rows.length) return;
 
     const byTime = [...rows].sort((a, b) =>
@@ -255,21 +270,28 @@ const renderBtcKpis = (rows) => {
     const min   = Math.min(...prices);
     const changePct = ((last - first) / first) * 100;
 
-    document.getElementById("btcCurrentPrice" + sfx).textContent = formatCryptoPrice(last);
-    document.getElementById("btcHighPrice" + sfx).textContent    = formatCryptoPrice(max);
-    document.getElementById("btcLowPrice" + sfx).textContent     = formatCryptoPrice(min);
+    const currentEl = getScopedElement("btcCurrentPrice", suffix);
+    const highEl = getScopedElement("btcHighPrice", suffix);
+    const lowEl = getScopedElement("btcLowPrice", suffix);
+    const changeEl = getScopedElement("btcPriceChange", suffix);
 
-    const changeEl = document.getElementById("btcPriceChange" + sfx);
+    if (!currentEl || !highEl || !lowEl || !changeEl) {
+        return;
+    }
+
+    currentEl.textContent = formatCryptoPrice(last);
+    highEl.textContent    = formatCryptoPrice(max);
+    lowEl.textContent     = formatCryptoPrice(min);
+
     changeEl.textContent = `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`;
     changeEl.className = `btc-kpi-value ${changePct >= 0 ? "btc-kpi-positive" : "btc-kpi-negative"}`;
 
     kpiRow.hidden = false;
 };
 
-const renderBtcChart = (rows) => {
-    const sfx = document.getElementById("btcChartWrapper") ? "" : "Btc";
-    const wrapper = document.getElementById("btcChartWrapper" + sfx);
-    const canvas  = document.getElementById("btcPriceChart" + sfx);
+const renderBtcChart = (rows, suffix = "Btc") => {
+    const wrapper = getScopedElement("btcChartWrapper", suffix);
+    const canvas  = getScopedElement("btcPriceChart", suffix);
     if (!wrapper || !canvas || !rows.length) return;
 
     if (typeof Chart === "undefined") {
@@ -293,9 +315,13 @@ const renderBtcChart = (rows) => {
     const maxVal = Math.max(...data);
     const minVal = Math.min(...data);
 
-    if (btcChart) { btcChart.destroy(); btcChart = null; }
+    const existingChart = btcCharts.get(suffix);
+    if (existingChart) {
+        existingChart.destroy();
+        btcCharts.delete(suffix);
+    }
 
-    btcChart = new Chart(canvas, {
+    const chart = new Chart(canvas, {
         type: "line",
         data: {
             labels,
@@ -365,12 +391,14 @@ const renderBtcChart = (rows) => {
             }
         }
     });
+    btcCharts.set(suffix, chart);
 
     wrapper.hidden = false;
 };
 
-const loadCryptoPrices = async () => {
-    const btn = document.getElementById("loadCryptoPricesBtn") ?? document.getElementById("loadCryptoPricesBtnBtc");
+const loadCryptoPrices = async (buttonOrEvent) => {
+    const suffix = getDashboardSuffix(buttonOrEvent);
+    const btn = getScopedElement("loadCryptoPricesBtn", suffix);
     if (!btn) {
         return;
     }
@@ -397,27 +425,27 @@ const loadCryptoPrices = async () => {
             const fallbackMessage = `Erro ${response.status} ao consultar crypto_prices.`;
             const details = result && result.details ? ` Detalhes: ${result.details}` : "";
             if (loadingToast) loadingToast.querySelector(".toast__close").click();
-            setCryptoFeedback(((result && result.message) || fallbackMessage) + details, "error");
+            setCryptoFeedback(((result && result.message) || fallbackMessage) + details, "error", suffix);
             showToast(((result && result.message) || fallbackMessage) + details, "error", 7000);
             return;
         }
 
         if (!result || !Array.isArray(result.data)) {
             if (loadingToast) loadingToast.querySelector(".toast__close").click();
-            setCryptoFeedback("Resposta inesperada da API para crypto_prices.", "error");
+            setCryptoFeedback("Resposta inesperada da API para crypto_prices.", "error", suffix);
             showToast("Resposta inesperada da API para crypto_prices.", "error", 7000);
             return;
         }
 
-        renderCryptoRows(result.data);
-        renderBtcKpis(result.data);
-        renderBtcChart(result.data);
+        renderCryptoRows(result.data, suffix);
+        renderBtcKpis(result.data, suffix);
+        renderBtcChart(result.data, suffix);
         if (loadingToast) loadingToast.querySelector(".toast__close").click();
-        setCryptoFeedback(`Atualização concluída: ${result.data.length} registros retornados.`, "success");
+        setCryptoFeedback(`Atualização concluída: ${result.data.length} registros retornados.`, "success", suffix);
         showToast(`${result.data.length} registros carregados com sucesso.`, "success");
     } catch (_error) {
         if (loadingToast) loadingToast.querySelector(".toast__close").click();
-        setCryptoFeedback("Não foi possível executar o fluxo Extract + Load para crypto_prices.", "error");
+        setCryptoFeedback("Não foi possível executar o fluxo Extract + Load para crypto_prices.", "error", suffix);
         showToast("Falha na conexão com a API. Tente novamente.", "error", 7000);
     } finally {
         btn.disabled = false;
@@ -427,8 +455,14 @@ const loadCryptoPrices = async () => {
 window.bindDashboardButtons = () => {
     const ouroBtn = document.getElementById("loadCryptoPricesBtn");
     const btcBtn  = document.getElementById("loadCryptoPricesBtnBtc");
-    if (ouroBtn) ouroBtn.addEventListener("click", loadCryptoPrices);
-    if (btcBtn)  btcBtn.addEventListener("click", loadCryptoPrices);
+    if (ouroBtn && ouroBtn.dataset.bound !== "1") {
+        ouroBtn.addEventListener("click", () => loadCryptoPrices(""));
+        ouroBtn.dataset.bound = "1";
+    }
+    if (btcBtn && btcBtn.dataset.bound !== "1") {
+        btcBtn.addEventListener("click", () => loadCryptoPrices("Btc"));
+        btcBtn.dataset.bound = "1";
+    }
 };
 
 const loadSession = async () => {
@@ -496,9 +530,7 @@ if (menuToggleBtn) {
     });
 }
 
-if (loadCryptoPricesBtn) {
-    loadCryptoPricesBtn.addEventListener("click", loadCryptoPrices);
-}
+bindDashboardButtons();
 
 window.addEventListener("resize", hydrateSidebarState);
 
