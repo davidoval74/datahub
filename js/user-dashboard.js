@@ -190,6 +190,61 @@ const formatCryptoPrice = (value) => {
     }).format(numeric);
 };
 
+const parseTimestampMs = (value) => {
+    const normalized = String(value ?? "").replace(" ", "T");
+    const ts = new Date(normalized).getTime();
+    return Number.isNaN(ts) ? null : ts;
+};
+
+const getLast30DaysWindow = (rows) => {
+    const timestamps = rows
+        .map((row) => parseTimestampMs(row.timestamp))
+        .filter((ts) => ts !== null);
+
+    if (!timestamps.length) {
+        return null;
+    }
+
+    const endMs = Math.max(...timestamps);
+    const startMs = endMs - (30 * 24 * 60 * 60 * 1000);
+    return { startMs, endMs };
+};
+
+const filterRowsToLast30Days = (rows) => {
+    const windowRange = getLast30DaysWindow(rows);
+    if (!windowRange) {
+        return { filteredRows: [], windowRange: null };
+    }
+
+    const filteredRows = rows.filter((row) => {
+        const ts = parseTimestampMs(row.timestamp);
+        return ts !== null && ts >= windowRange.startMs && ts <= windowRange.endMs;
+    });
+
+    return { filteredRows, windowRange };
+};
+
+const updateDateFilterLabel = (suffix, windowRange) => {
+    const labelEl = getScopedElement("dateFilterLabel", suffix);
+    const startEl = getScopedElement("dateFilterStart", suffix);
+    const endEl = getScopedElement("dateFilterEnd", suffix);
+
+    if (!labelEl || !startEl || !endEl) {
+        return;
+    }
+
+    labelEl.textContent = "Ultimos 30 dias";
+
+    if (!windowRange) {
+        startEl.textContent = "--/--/----";
+        endEl.textContent = "--/--/----";
+        return;
+    }
+
+    startEl.textContent = formatCryptoTimestamp(new Date(windowRange.startMs).toISOString());
+    endEl.textContent = formatCryptoTimestamp(new Date(windowRange.endMs).toISOString());
+};
+
 const adjustCryptoTableViewport = (rowsCount, suffix = "Btc") => {
     const el = getScopedElement("cryptoPricesResult", suffix);
     if (!el) {
@@ -322,13 +377,15 @@ const renderBtcChart = (rows, suffix = "Btc") => {
         btcCharts.delete(suffix);
     }
 
+    const seriesLabel = suffix === "" ? "OURO/USD" : "BTC/USD";
+
     const chart = new Chart(canvas, {
         type: "line",
         data: {
             labels,
             datasets: [
                 {
-                    label: "BTC/USD",
+                    label: seriesLabel,
                     data,
                     borderColor: "#0c8bc5",
                     backgroundColor: "rgba(12,139,197,0.07)",
@@ -440,12 +497,23 @@ const loadCryptoPrices = async (buttonOrEvent) => {
             return;
         }
 
-        renderCryptoRows(result.data, suffix);
-        renderBtcKpis(result.data, suffix);
-        renderBtcChart(result.data, suffix);
+        const { filteredRows, windowRange } = filterRowsToLast30Days(result.data);
+        updateDateFilterLabel(suffix, windowRange);
+
+        if (!filteredRows.length) {
+            if (loadingToast) loadingToast.querySelector(".toast__close").click();
+            renderCryptoRows([], suffix);
+            setCryptoFeedback("Sem dados no filtro fixo de 30 dias.", "error", suffix);
+            showToast("Sem dados para os ultimos 30 dias.", "info", 5000);
+            return;
+        }
+
+        renderCryptoRows(filteredRows, suffix);
+        renderBtcKpis(filteredRows, suffix);
+        renderBtcChart(filteredRows, suffix);
         if (loadingToast) loadingToast.querySelector(".toast__close").click();
-        setCryptoFeedback(`Atualização concluída: ${result.data.length} registros retornados.`, "success", suffix);
-        showToast(`${result.data.length} registros carregados com sucesso.`, "success");
+        setCryptoFeedback(`Atualizacao concluida: ${filteredRows.length} registros nos ultimos 30 dias.`, "success", suffix);
+        showToast(`${filteredRows.length} registros carregados (30 dias).`, "success");
     } catch (_error) {
         if (loadingToast) loadingToast.querySelector(".toast__close").click();
         setCryptoFeedback("Não foi possível executar o fluxo Extract + Load para crypto_prices.", "error", suffix);

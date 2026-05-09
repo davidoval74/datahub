@@ -7,6 +7,13 @@
         <i class="fa-solid fa-rotate"></i> Atualizar
     </button>
 </div>
+<div class="date-filter-fixed" role="status" aria-live="polite">
+    <span class="date-filter-pill"><i class="fa-regular fa-calendar"></i> Filtro ativo</span>
+    <span class="date-filter-window" id="dateFilterLabel">Ultimos 30 dias</span>
+    <span class="date-filter-boundary" id="dateFilterStart">--/--/----</span>
+    <span class="date-filter-sep">ate</span>
+    <span class="date-filter-boundary" id="dateFilterEnd">--/--/----</span>
+</div>
 <div id="btcKpiRow" class="btc-kpi-row" hidden>
     <div class="btc-kpi"><span class="btc-kpi-label">Último preço</span><span class="btc-kpi-value" id="btcCurrentPrice">—</span></div>
     <div class="btc-kpi"><span class="btc-kpi-label">Máxima</span><span class="btc-kpi-value btc-kpi-high" id="btcHighPrice">—</span></div>
