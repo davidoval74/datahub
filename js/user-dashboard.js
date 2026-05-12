@@ -9,6 +9,7 @@ const toolCards = Array.from(document.querySelectorAll(".tool-card"));
 const contentRoot = document.querySelector(".user-content");
 const loadCryptoPricesBtn = document.getElementById("loadCryptoPricesBtn");
 const btcCharts = new Map();
+const dashboardState = new Map();
 const appBaseFromUser = window.location.pathname.replace(/\/usuario(?:\/index\.html)?\/?$/, "");
 const appOrigin = `${window.location.origin}${appBaseFromUser}`;
 const meEndpoint = `${appOrigin}/api/auth/me.php`;
@@ -196,6 +197,42 @@ const parseTimestampMs = (value) => {
     return Number.isNaN(ts) ? null : ts;
 };
 
+const toInputDate = (timestampMs) => {
+    const date = new Date(timestampMs);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+};
+
+const parseInputDateRange = (startValue, endValue) => {
+    if (!startValue || !endValue) {
+        return null;
+    }
+
+    const startDate = new Date(`${startValue}T00:00:00`);
+    const endDate = new Date(`${endValue}T23:59:59.999`);
+    const startMs = startDate.getTime();
+    const endMs = endDate.getTime();
+
+    if (Number.isNaN(startMs) || Number.isNaN(endMs) || startMs > endMs) {
+        return null;
+    }
+
+    return { startMs, endMs };
+};
+
+const getDashboardStore = (suffix = "Btc") => {
+    if (!dashboardState.has(suffix)) {
+        dashboardState.set(suffix, {
+            rawRows: [],
+            mode: "last30"
+        });
+    }
+
+    return dashboardState.get(suffix);
+};
+
 const getLast30DaysWindow = (rows) => {
     const timestamps = rows
         .map((row) => parseTimestampMs(row.timestamp))
@@ -210,21 +247,29 @@ const getLast30DaysWindow = (rows) => {
     return { startMs, endMs };
 };
 
+const filterRowsByWindow = (rows, windowRange) => {
+    if (!windowRange) {
+        return [];
+    }
+
+    return rows.filter((row) => {
+        const ts = parseTimestampMs(row.timestamp);
+        return ts !== null && ts >= windowRange.startMs && ts <= windowRange.endMs;
+    });
+};
+
 const filterRowsToLast30Days = (rows) => {
     const windowRange = getLast30DaysWindow(rows);
     if (!windowRange) {
         return { filteredRows: [], windowRange: null };
     }
 
-    const filteredRows = rows.filter((row) => {
-        const ts = parseTimestampMs(row.timestamp);
-        return ts !== null && ts >= windowRange.startMs && ts <= windowRange.endMs;
-    });
+    const filteredRows = filterRowsByWindow(rows, windowRange);
 
     return { filteredRows, windowRange };
 };
 
-const updateDateFilterLabel = (suffix, windowRange) => {
+const updateDateFilterLabel = (suffix, windowRange, label = "Ultimos 30 dias") => {
     const labelEl = getScopedElement("dateFilterLabel", suffix);
     const startEl = getScopedElement("dateFilterStart", suffix);
     const endEl = getScopedElement("dateFilterEnd", suffix);
@@ -233,7 +278,7 @@ const updateDateFilterLabel = (suffix, windowRange) => {
         return;
     }
 
-    labelEl.textContent = "Ultimos 30 dias";
+    labelEl.textContent = label;
 
     if (!windowRange) {
         startEl.textContent = "--/--/----";
@@ -243,6 +288,43 @@ const updateDateFilterLabel = (suffix, windowRange) => {
 
     startEl.textContent = formatCryptoTimestamp(new Date(windowRange.startMs).toISOString());
     endEl.textContent = formatCryptoTimestamp(new Date(windowRange.endMs).toISOString());
+};
+
+const syncFilterInputs = (suffix, windowRange) => {
+    const startInput = getScopedElement("dateFilterStartInput", suffix);
+    const endInput = getScopedElement("dateFilterEndInput", suffix);
+
+    if (!startInput || !endInput) {
+        return;
+    }
+
+    if (!windowRange) {
+        startInput.value = "";
+        endInput.value = "";
+        return;
+    }
+
+    startInput.value = toInputDate(windowRange.startMs);
+    endInput.value = toInputDate(windowRange.endMs);
+};
+
+const clearDashboardVisuals = (suffix = "Btc") => {
+    const kpiRow = getScopedElement("btcKpiRow", suffix);
+    const chartWrapper = getScopedElement("btcChartWrapper", suffix);
+
+    if (kpiRow) {
+        kpiRow.hidden = true;
+    }
+
+    if (chartWrapper) {
+        chartWrapper.hidden = true;
+    }
+
+    const existingChart = btcCharts.get(suffix);
+    if (existingChart) {
+        existingChart.destroy();
+        btcCharts.delete(suffix);
+    }
 };
 
 const adjustCryptoTableViewport = (rowsCount, suffix = "Btc") => {
@@ -454,6 +536,93 @@ const renderBtcChart = (rows, suffix = "Btc") => {
     wrapper.hidden = false;
 };
 
+const applyFilterToDashboard = (suffix = "Btc") => {
+    const store = getDashboardStore(suffix);
+    const rows = Array.isArray(store.rawRows) ? store.rawRows : [];
+
+    if (!rows.length) {
+        clearDashboardVisuals(suffix);
+        renderCryptoRows([], suffix);
+        updateDateFilterLabel(suffix, null, "Sem dados");
+        return { filteredRows: [], windowRange: null, label: "Sem dados", mode: store.mode };
+    }
+
+    if (store.mode === "manual") {
+        const startInput = getScopedElement("dateFilterStartInput", suffix);
+        const endInput = getScopedElement("dateFilterEndInput", suffix);
+        const manualRange = parseInputDateRange(startInput?.value, endInput?.value);
+
+        if (!manualRange) {
+            setCryptoFeedback("Intervalo invalido. Use datas de inicio e fim validas.", "error", suffix);
+            return { filteredRows: null, windowRange: null, label: "Intervalo invalido", mode: store.mode };
+        }
+
+        const manualRows = filterRowsByWindow(rows, manualRange);
+        updateDateFilterLabel(suffix, manualRange, "Intervalo manual");
+
+        if (!manualRows.length) {
+            clearDashboardVisuals(suffix);
+            renderCryptoRows([], suffix);
+            setCryptoFeedback("Nenhum registro encontrado para o periodo informado.", "error", suffix);
+            return { filteredRows: [], windowRange: manualRange, label: "Intervalo manual", mode: store.mode };
+        }
+
+        renderCryptoRows(manualRows, suffix);
+        renderBtcKpis(manualRows, suffix);
+        renderBtcChart(manualRows, suffix);
+        setCryptoFeedback(`${manualRows.length} registros no intervalo manual.`, "success", suffix);
+        return { filteredRows: manualRows, windowRange: manualRange, label: "Intervalo manual", mode: store.mode };
+    }
+
+    const { filteredRows, windowRange } = filterRowsToLast30Days(rows);
+    updateDateFilterLabel(suffix, windowRange, "Ultimos 30 dias");
+    syncFilterInputs(suffix, windowRange);
+
+    if (!filteredRows.length) {
+        clearDashboardVisuals(suffix);
+        renderCryptoRows([], suffix);
+        setCryptoFeedback("Sem dados no filtro fixo de 30 dias.", "error", suffix);
+        return { filteredRows: [], windowRange, label: "Ultimos 30 dias", mode: store.mode };
+    }
+
+    renderCryptoRows(filteredRows, suffix);
+    renderBtcKpis(filteredRows, suffix);
+    renderBtcChart(filteredRows, suffix);
+    setCryptoFeedback(`Atualizacao concluida: ${filteredRows.length} registros nos ultimos 30 dias.`, "success", suffix);
+    return { filteredRows, windowRange, label: "Ultimos 30 dias", mode: store.mode };
+};
+
+const applyManualFilter = (suffix = "Btc") => {
+    const store = getDashboardStore(suffix);
+    store.mode = "manual";
+    const result = applyFilterToDashboard(suffix);
+
+    if (result.filteredRows === null) {
+        showToast("Filtro invalido. Verifique as datas informadas.", "error", 5000);
+        return;
+    }
+
+    if (!result.filteredRows.length) {
+        showToast("Nenhum dado para o intervalo informado.", "info", 5000);
+        return;
+    }
+
+    showToast(`${result.filteredRows.length} registros carregados (intervalo manual).`, "success");
+};
+
+const resetToLast30DaysFilter = (suffix = "Btc") => {
+    const store = getDashboardStore(suffix);
+    store.mode = "last30";
+    const result = applyFilterToDashboard(suffix);
+
+    if (!result.filteredRows.length) {
+        showToast("Sem dados para os ultimos 30 dias.", "info", 5000);
+        return;
+    }
+
+    showToast(`${result.filteredRows.length} registros carregados (30 dias).`, "success");
+};
+
 const loadCryptoPrices = async (buttonOrEvent) => {
     const suffix = getDashboardSuffix(buttonOrEvent);
     const endpoint = suffix === "" ? goldPricesEndpoint : cryptoPricesEndpoint;
@@ -497,23 +666,28 @@ const loadCryptoPrices = async (buttonOrEvent) => {
             return;
         }
 
-        const { filteredRows, windowRange } = filterRowsToLast30Days(result.data);
-        updateDateFilterLabel(suffix, windowRange);
+        const store = getDashboardStore(suffix);
+        store.rawRows = result.data;
+        if (store.mode !== "manual") {
+            store.mode = "last30";
+        }
 
-        if (!filteredRows.length) {
+        const filterResult = applyFilterToDashboard(suffix);
+
+        if (!filterResult.filteredRows || !filterResult.filteredRows.length) {
             if (loadingToast) loadingToast.querySelector(".toast__close").click();
-            renderCryptoRows([], suffix);
-            setCryptoFeedback("Sem dados no filtro fixo de 30 dias.", "error", suffix);
-            showToast("Sem dados para os ultimos 30 dias.", "info", 5000);
+            const isManual = store.mode === "manual";
+            showToast(isManual ? "Nenhum dado para o intervalo informado." : "Sem dados para os ultimos 30 dias.", "info", 5000);
             return;
         }
 
-        renderCryptoRows(filteredRows, suffix);
-        renderBtcKpis(filteredRows, suffix);
-        renderBtcChart(filteredRows, suffix);
         if (loadingToast) loadingToast.querySelector(".toast__close").click();
-        setCryptoFeedback(`Atualizacao concluida: ${filteredRows.length} registros nos ultimos 30 dias.`, "success", suffix);
-        showToast(`${filteredRows.length} registros carregados (30 dias).`, "success");
+        showToast(
+            store.mode === "manual"
+                ? `${filterResult.filteredRows.length} registros carregados (intervalo manual).`
+                : `${filterResult.filteredRows.length} registros carregados (30 dias).`,
+            "success"
+        );
     } catch (_error) {
         if (loadingToast) loadingToast.querySelector(".toast__close").click();
         setCryptoFeedback("Não foi possível executar o fluxo Extract + Load para crypto_prices.", "error", suffix);
@@ -526,13 +700,39 @@ const loadCryptoPrices = async (buttonOrEvent) => {
 window.bindDashboardButtons = () => {
     const ouroBtn = document.getElementById("loadCryptoPricesBtn");
     const btcBtn  = document.getElementById("loadCryptoPricesBtnBtc");
+    const applyFilterBtn = document.getElementById("applyDateFilterBtn");
+    const applyFilterBtnBtc = document.getElementById("applyDateFilterBtnBtc");
+    const resetFilterBtn = document.getElementById("resetDateFilterBtn");
+    const resetFilterBtnBtc = document.getElementById("resetDateFilterBtnBtc");
+
     if (ouroBtn && ouroBtn.dataset.bound !== "1") {
         ouroBtn.addEventListener("click", () => loadCryptoPrices(""));
         ouroBtn.dataset.bound = "1";
     }
+
     if (btcBtn && btcBtn.dataset.bound !== "1") {
         btcBtn.addEventListener("click", () => loadCryptoPrices("Btc"));
         btcBtn.dataset.bound = "1";
+    }
+
+    if (applyFilterBtn && applyFilterBtn.dataset.bound !== "1") {
+        applyFilterBtn.addEventListener("click", () => applyManualFilter(""));
+        applyFilterBtn.dataset.bound = "1";
+    }
+
+    if (applyFilterBtnBtc && applyFilterBtnBtc.dataset.bound !== "1") {
+        applyFilterBtnBtc.addEventListener("click", () => applyManualFilter("Btc"));
+        applyFilterBtnBtc.dataset.bound = "1";
+    }
+
+    if (resetFilterBtn && resetFilterBtn.dataset.bound !== "1") {
+        resetFilterBtn.addEventListener("click", () => resetToLast30DaysFilter(""));
+        resetFilterBtn.dataset.bound = "1";
+    }
+
+    if (resetFilterBtnBtc && resetFilterBtnBtc.dataset.bound !== "1") {
+        resetFilterBtnBtc.addEventListener("click", () => resetToLast30DaysFilter("Btc"));
+        resetFilterBtnBtc.dataset.bound = "1";
     }
 };
 

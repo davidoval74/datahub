@@ -13,7 +13,20 @@
     <span class="date-filter-boundary" id="dateFilterStartBtc">--/--/----</span>
     <span class="date-filter-sep">ate</span>
     <span class="date-filter-boundary" id="dateFilterEndBtc">--/--/----</span>
+    <div class="date-filter-controls">
+        <label class="date-input-group" for="dateFilterStartInputBtc">
+            <span>De</span>
+            <input id="dateFilterStartInputBtc" type="date">
+        </label>
+        <label class="date-input-group" for="dateFilterEndInputBtc">
+            <span>Ate</span>
+            <input id="dateFilterEndInputBtc" type="date">
+        </label>
+        <button type="button" id="applyDateFilterBtnBtc" class="date-filter-btn date-filter-btn-primary">Aplicar</button>
+        <button type="button" id="resetDateFilterBtnBtc" class="date-filter-btn">Ultimos 30 dias</button>
+    </div>
 </div>
+<div id="cryptoPricesFeedbackBtc" class="tool-feedback" aria-live="polite"></div>
 <div id="btcKpiRowBtc" class="btc-kpi-row" hidden>
     <div class="btc-kpi"><span class="btc-kpi-label">Último preço</span><span class="btc-kpi-value" id="btcCurrentPriceBtc">—</span></div>
     <div class="btc-kpi"><span class="btc-kpi-label">Máxima</span><span class="btc-kpi-value btc-kpi-high" id="btcHighPriceBtc">—</span></div>
