@@ -11,7 +11,7 @@ url = "https://api.coingecko.com/api/v3/coins/pax-gold/market_chart"
 
 params = {
     "vs_currency": "usd",
-    "days": "30"
+    "days": "360"
 }
 
 response = requests.get(url, params=params)
@@ -25,3 +25,4 @@ df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
 df.to_csv(CSV_PATH, index=False)
 
 print(f"CSV atualizado em {CSV_PATH}")
+
