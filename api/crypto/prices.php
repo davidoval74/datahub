@@ -9,7 +9,7 @@ if (empty($_SESSION['auth_user'])) {
     send_json(401, ['ok' => false, 'message' => 'Nao autenticado.']);
 }
 
-function run_python_script($pythonBinary, $scriptPath, $workingDirectory) {
+function run_python_script($pythonBinary, $scriptPath, $workingDirectory, $args = []) {
     if (!function_exists('exec')) {
         throw new RuntimeException('A funcao exec nao esta habilitada no servidor PHP.');
     }
@@ -26,8 +26,15 @@ function run_python_script($pythonBinary, $scriptPath, $workingDirectory) {
     $output = [];
     $exitCode = 0;
 
+    // Monta a linha de comando com argumentos extras
+    $cmd = escapeshellarg($pythonBinary) . ' ' . escapeshellarg($scriptPath);
+    foreach ($args as $arg) {
+        $cmd .= ' ' . escapeshellarg($arg);
+    }
+    $cmd .= ' 2>&1';
+
     chdir($workingDirectory);
-    exec(escapeshellarg($pythonBinary) . ' ' . escapeshellarg($scriptPath) . ' 2>&1', $output, $exitCode);
+    exec($cmd, $output, $exitCode);
     if ($originalDirectory !== false) {
         chdir($originalDirectory);
     }
@@ -101,7 +108,9 @@ try {
     $loadScript = $pythonDirectory . DIRECTORY_SEPARATOR . 'Load.py';
     $csvPath = realpath(__DIR__ . '/../../bitcoin_prices.csv') ?: (__DIR__ . '/../../bitcoin_prices.csv');
 
-    $extractOutput = run_python_script($pythonBinary, $extractScript, $pythonDirectory);
+    // Captura o filtro days do GET, padrao 360
+    $days = isset($_GET['days']) && is_numeric($_GET['days']) ? (int)$_GET['days'] : 360;
+    $extractOutput = run_python_script($pythonBinary, $extractScript, $pythonDirectory, [$days]);
     try {
         $loadOutput = run_python_script($pythonBinary, $loadScript, $pythonDirectory);
     } catch (RuntimeException $loadException) {
