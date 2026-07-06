@@ -7,12 +7,19 @@
         <i class="fa-solid fa-rotate"></i> Atualizar
     </button>
 </div>
-<div class="date-filter-fixed" role="status" aria-live="polite">
-    <span class="date-filter-pill"><i class="fa-regular fa-calendar"></i> Filtro ativo</span>
-    <span class="date-filter-window" id="dateFilterLabelBtc">Periodo padrao</span>
-    <span class="date-filter-boundary" id="dateFilterStartBtc">--/--/----</span>
-    <span class="date-filter-sep">ate</span>
-    <span class="date-filter-boundary" id="dateFilterEndBtc">--/--/----</span>
+<div class="date-filter-panel" role="status" aria-live="polite">
+    <div class="date-filter-status">
+        <span class="date-filter-status-dot" aria-hidden="true"></span>
+        <span class="date-filter-status-label"><i class="fa-regular fa-calendar"></i> Filtro ativo</span>
+    </div>
+    <div class="date-filter-summary">
+        <span class="date-filter-summary-label" id="dateFilterLabelBtc">Periodo padrao</span>
+        <div class="date-filter-summary-range">
+            <span class="date-filter-boundary" id="dateFilterStartBtc">--/--/----</span>
+            <span class="date-filter-sep">ate</span>
+            <span class="date-filter-boundary" id="dateFilterEndBtc">--/--/----</span>
+        </div>
+    </div>
     <div class="date-filter-controls">
         <label class="date-input-group" for="dateFilterStartInputBtc">
             <span>De</span>
@@ -23,7 +30,6 @@
             <input id="dateFilterEndInputBtc" type="date">
         </label>
         <button type="button" id="applyDateFilterBtnBtc" class="date-filter-btn date-filter-btn-primary">Aplicar</button>
-        <button type="button" id="resetDateFilterBtnBtc" class="date-filter-btn">Periodo padrao</button>
     </div>
 </div>
 <div id="cryptoPricesFeedbackBtc" class="tool-feedback" aria-live="polite"></div>
